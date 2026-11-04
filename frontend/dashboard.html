@@ -198,9 +198,17 @@
 
         <div class="dashboard-scroll" id="mainSection">
             
-            <div style="margin-bottom:20px;">
-                <div id="greeting" style="font-size: 24px; font-weight: 800; font-family:'Outfit'; color: var(--primary);">Loading...</div>
-                <div style="font-size: 13px; color: var(--text-light); margin-top: 4px;" id="dateStr">Loading date...</div>
+            <div style="margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                <div>
+                    <div id="greeting" style="font-size: 24px; font-weight: 800; font-family:'Outfit'; color: var(--primary);">Loading...</div>
+                    <div style="font-size: 13px; color: var(--text-light); margin-top: 4px;" id="dateStr">Loading date...</div>
+                </div>
+                <div>
+                    <button onclick="showApplyLeaveModal()" class="btn" style="background:linear-gradient(135deg, #0ea5e9, #6366f1); color:white; font-weight:700; padding:10px 18px; border-radius:8px; border:none; box-shadow:0 4px 12px rgba(14,165,233,0.3); display:inline-flex; align-items:center; gap:8px; cursor:pointer;">
+                        <i class="fa-solid fa-calendar-minus"></i>
+                        <span>Apply Leave</span>
+                    </button>
+                </div>
             </div>
 
             <!-- KPI Cards -->
@@ -894,5 +902,96 @@ window.showSection = function(name) {
         </div>
     </div>
 
+    <!-- Leave Application Modal -->
+    <div id="applyLeaveModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.7); backdrop-filter:blur(6px); z-index:99999; justify-content:center; align-items:center; padding:20px;">
+        <div style="background:white; padding:26px; border-radius:16px; width:100%; max-width:440px; box-shadow:0 20px 40px rgba(0,0,0,0.25); position:relative;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <h3 style="margin:0; font-family:'Outfit', sans-serif; font-size:20px; color:var(--primary); display:flex; align-items:center; gap:8px;">
+                    <i class="fa-solid fa-calendar-minus" style="color:#0ea5e9;"></i> Apply for Leave
+                </h3>
+                <button onclick="hideApplyLeaveModal()" style="background:none; border:none; font-size:20px; color:#94a3b8; cursor:pointer;">&times;</button>
+            </div>
+            
+            <div style="margin-bottom:14px;">
+                <label style="font-size:12px; font-weight:700; color:#334155; margin-bottom:4px; display:block;">Leave Type</label>
+                <select id="leaveTypeInput" style="width:100%; padding:9px 12px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; outline:none; background:#f8fafc;">
+                    <option value="Annual Leave">Annual Leave</option>
+                    <option value="Sick Leave">Sick Leave</option>
+                    <option value="Casual Leave">Casual Leave</option>
+                    <option value="Emergency Leave">Emergency Leave</option>
+                    <option value="Unpaid Leave">Unpaid Leave</option>
+                </select>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px;">
+                <div>
+                    <label style="font-size:12px; font-weight:700; color:#334155; margin-bottom:4px; display:block;">Start Date</label>
+                    <input type="date" id="leaveStartDate" style="width:100%; padding:9px 10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; outline:none; background:#f8fafc; box-sizing:border-box;">
+                </div>
+                <div>
+                    <label style="font-size:12px; font-weight:700; color:#334155; margin-bottom:4px; display:block;">End Date</label>
+                    <input type="date" id="leaveEndDate" style="width:100%; padding:9px 10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; outline:none; background:#f8fafc; box-sizing:border-box;">
+                </div>
+            </div>
+
+            <div style="margin-bottom:20px;">
+                <label style="font-size:12px; font-weight:700; color:#334155; margin-bottom:4px; display:block;">Reason for Leave</label>
+                <textarea id="leaveReasonInput" rows="3" placeholder="Please state your reason..." style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; outline:none; background:#f8fafc; resize:none; box-sizing:border-box;"></textarea>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:10px;">
+                <button onclick="hideApplyLeaveModal()" style="padding:10px 18px; border:1px solid #cbd5e1; background:#f1f5f9; color:#475569; border-radius:8px; cursor:pointer; font-weight:600; font-size:13px;">Cancel</button>
+                <button id="submitLeaveBtn" onclick="submitDashboardLeave()" style="padding:10px 20px; border:none; background:linear-gradient(135deg, #0ea5e9, #6366f1); color:white; border-radius:8px; cursor:pointer; font-weight:700; font-size:13px; box-shadow:0 4px 12px rgba(14,165,233,0.3);">Submit Application</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function showApplyLeaveModal() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('leaveStartDate').value = today;
+        document.getElementById('leaveEndDate').value = today;
+        document.getElementById('applyLeaveModal').style.display = 'flex';
+    }
+    function hideApplyLeaveModal() {
+        document.getElementById('applyLeaveModal').style.display = 'none';
+    }
+    async function submitDashboardLeave() {
+        const type = document.getElementById('leaveTypeInput').value;
+        const startDate = document.getElementById('leaveStartDate').value;
+        const endDate = document.getElementById('leaveEndDate').value;
+        const reason = document.getElementById('leaveReasonInput').value.trim();
+        const btn = document.getElementById('submitLeaveBtn');
+
+        if (!startDate || !endDate) return alert('Please select both start and end dates.');
+        if (!reason) return alert('Please provide a reason for your leave.');
+
+        btn.disabled = true;
+        btn.innerText = 'Submitting...';
+
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch('/api/leaves', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ leaveType: type, startDate, endDate, reason })
+            });
+
+            if (res.ok) {
+                alert('✅ Leave request submitted successfully!');
+                hideApplyLeaveModal();
+                document.getElementById('leaveReasonInput').value = '';
+            } else {
+                const err = await res.json();
+                alert('Error: ' + (err.error || 'Failed to submit leave request'));
+            }
+        } catch(e) {
+            alert('Connection error. Please try again.');
+        } finally {
+            btn.disabled = false;
+            btn.innerText = 'Submit Application';
+        }
+    }
+    </script>
 </body>
 </html>

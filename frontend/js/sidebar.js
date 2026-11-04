@@ -125,32 +125,7 @@
         });
     }
 
-    // Executive & HR specific management links
-    if (isExecutiveOrHR) {
-        navItems.push({
-            id: 'nav-leaves',
-            label: 'Leave Requests',
-            icon: 'fa-solid fa-calendar-minus',
-            href: 'dashboard.html?tab=leaves',
-            isActive: currentPage === 'dashboard.html' && activeTab === 'leaves',
-            onClick: currentPage === 'dashboard.html' ? "switchDashSection('leaves')" : null
-        });
-        navItems.push({
-            id: 'nav-holidays',
-            label: 'Holidays',
-            icon: 'fa-solid fa-umbrella-beach',
-            href: 'dashboard.html?tab=holidays',
-            isActive: currentPage === 'dashboard.html' && activeTab === 'holidays',
-            onClick: currentPage === 'dashboard.html' ? "switchDashSection('holidays')" : null
-        });
-        navItems.push({
-            id: 'nav-undertakings',
-            label: 'Undertakings',
-            icon: 'fa-solid fa-handshake',
-            href: 'undertakings.html',
-            isActive: currentPage === 'undertakings.html'
-        });
-    }
+
 
     // Badge HTML generator
     function makeBadge(badgeId) {
