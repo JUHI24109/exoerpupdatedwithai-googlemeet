@@ -820,7 +820,8 @@
 
         // Register Service Worker for PWA
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(() => {});
+            navigator.serviceWorker.register('/sw.js', { scope: '/' })
+                .catch(() => navigator.serviceWorker.register('sw.js').catch(() => {}));
         }
     }
 
@@ -829,75 +830,84 @@
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPwaPrompt = e;
+        console.log('[EXO ERP] PWA install prompt ready');
     });
 
     window.installExoApp = async function () {
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
         if (isStandalone) {
-            alert('EXO ERP is already running as an installed application.');
+            alert('EXO ERP is already installed and running as an app!');
             return;
         }
 
         if (deferredPwaPrompt) {
             try {
                 deferredPwaPrompt.prompt();
-                await deferredPwaPrompt.userChoice;
-                deferredPwaPrompt = null;
-                return;
-            } catch(e) {}
+                const choice = await deferredPwaPrompt.userChoice;
+                if (choice && choice.outcome === 'accepted') {
+                    deferredPwaPrompt = null;
+                    return;
+                }
+            } catch(e) {
+                console.warn('[EXO ERP] Prompt error:', e);
+            }
         }
 
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        showPwaModal(isIOS ? 'ios' : 'generic');
+        showPwaModal(isIOS ? 'ios' : 'android');
     };
 
     function showPwaModal(type) {
-        if (document.getElementById('exo-pwa-guide-modal')) return;
+        const existing = document.getElementById('exo-pwa-guide-modal');
+        if (existing) existing.remove();
+
         const modal = document.createElement('div');
         modal.id = 'exo-pwa-guide-modal';
-        modal.style.cssText = 'position:fixed;inset:0;z-index:99999999;background:rgba(15,23,42,0.85);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;';
+        modal.style.cssText = 'position:fixed;inset:0;z-index:99999999;background:rgba(15,23,42,0.88);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:16px;';
         
         const isIOS = type === 'ios';
         const stepsHtml = isIOS ? `
-            <div style="display:flex;flex-direction:column;gap:12px;text-align:left;font-size:13px;color:#e2e8f0;margin-bottom:20px;">
-                <div style="display:flex;align-items:center;gap:12px;background:#0f172a;padding:12px;border-radius:12px;">
-                    <span style="background:#0ea5e9;color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;">1</span>
-                    <span>Tap the <strong>Share</strong> button <i class="fa-solid fa-arrow-up-from-bracket" style="color:#0ea5e9;margin-left:4px;"></i> at bottom of Safari.</span>
+            <div style="display:flex;flex-direction:column;gap:10px;text-align:left;font-size:13px;color:#e2e8f0;margin-bottom:18px;">
+                <div style="display:flex;align-items:center;gap:12px;background:#0f172a;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);">
+                    <span style="background:#0ea5e9;color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;">1</span>
+                    <span>Safari ke bottom par <strong>Share</strong> icon <i class="fa-solid fa-arrow-up-from-bracket" style="color:#38bdf8;margin:0 4px;"></i> dabayein.</span>
                 </div>
-                <div style="display:flex;align-items:center;gap:12px;background:#0f172a;padding:12px;border-radius:12px;">
-                    <span style="background:#0ea5e9;color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;">2</span>
-                    <span>Scroll down and select <strong>"Add to Home Screen"</strong> <i class="fa-regular fa-square-plus" style="color:#0ea5e9;margin-left:4px;"></i>.</span>
+                <div style="display:flex;align-items:center;gap:12px;background:#0f172a;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);">
+                    <span style="background:#0ea5e9;color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;">2</span>
+                    <span>Neeche scroll karein aur <strong>"Add to Home Screen"</strong> <i class="fa-regular fa-square-plus" style="color:#38bdf8;margin:0 4px;"></i> select karein.</span>
                 </div>
-                <div style="display:flex;align-items:center;gap:12px;background:#0f172a;padding:12px;border-radius:12px;">
-                    <span style="background:#0ea5e9;color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;">3</span>
-                    <span>Tap <strong>Add</strong> at top right to install EXO ERP app!</span>
+                <div style="display:flex;align-items:center;gap:12px;background:#0f172a;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);">
+                    <span style="background:#0ea5e9;color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;">3</span>
+                    <span>Upar right corner par <strong>Add</strong> dabayein — App install ho jayegi!</span>
                 </div>
             </div>
         ` : `
-            <div style="display:flex;flex-direction:column;gap:12px;text-align:left;font-size:13px;color:#e2e8f0;margin-bottom:20px;">
-                <div style="display:flex;align-items:center;gap:12px;background:#0f172a;padding:12px;border-radius:12px;">
-                    <span style="background:#0ea5e9;color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;">1</span>
-                    <span>Tap browser menu <strong>(⋮ or ⋯)</strong> at the top right.</span>
+            <div style="display:flex;flex-direction:column;gap:10px;text-align:left;font-size:13px;color:#e2e8f0;margin-bottom:18px;">
+                <div style="display:flex;align-items:center;gap:12px;background:#0f172a;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);">
+                    <span style="background:#0ea5e9;color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;">1</span>
+                    <span>Chrome / Browser ke upar <strong>3 dots (⋮ or ⋯)</strong> menu dabayein.</span>
                 </div>
-                <div style="display:flex;align-items:center;gap:12px;background:#0f172a;padding:12px;border-radius:12px;">
-                    <span style="background:#0ea5e9;color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;">2</span>
-                    <span>Select <strong>"Install app"</strong> or <strong>"Add to Home screen"</strong>.</span>
+                <div style="display:flex;align-items:center;gap:12px;background:#0f172a;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);">
+                    <span style="background:#0ea5e9;color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;">2</span>
+                    <span>Menu me <strong>"Install app"</strong> ya <strong>"Add to Home screen"</strong> select karein.</span>
                 </div>
-                <div style="display:flex;align-items:center;gap:12px;background:#0f172a;padding:12px;border-radius:12px;">
-                    <span style="background:#0ea5e9;color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;">3</span>
-                    <span>Confirm <strong>Install</strong> to add EXO ERP to your device!</span>
+                <div style="display:flex;align-items:center;gap:12px;background:#0f172a;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);">
+                    <span style="background:#0ea5e9;color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;">3</span>
+                    <span>Popup par <strong>Install</strong> dabayein — App seedha phone me download/add ho jayegi!</span>
                 </div>
             </div>
         `;
 
         modal.innerHTML = `
-            <div style="background:#1e293b;border:1px solid rgba(255,255,255,0.15);border-radius:20px;max-width:380px;width:100%;padding:24px;text-align:center;color:white;position:relative;box-shadow:0 20px 40px rgba(0,0,0,0.6);">
-                <button onclick="document.getElementById('exo-pwa-guide-modal').remove()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:#94a3b8;font-size:22px;cursor:pointer;">&times;</button>
-                <img src="exologo.png" style="width:64px;height:64px;border-radius:12px;margin-bottom:12px;object-fit:contain;filter:brightness(0) invert(1);" />
-                <h3 style="font-size:18px;font-weight:800;margin-bottom:8px;">Install EXO ERP App</h3>
-                <p style="font-size:13px;color:#94a3b8;margin-bottom:18px;">Install on your mobile home screen in 3 quick steps:</p>
+            <div style="background:#1e293b;border:1px solid rgba(255,255,255,0.18);border-radius:22px;max-width:400px;width:100%;padding:24px;text-align:center;color:white;position:relative;box-shadow:0 25px 50px rgba(0,0,0,0.7);">
+                <button onclick="document.getElementById('exo-pwa-guide-modal').remove()" style="position:absolute;top:14px;right:16px;background:none;border:none;color:#94a3b8;font-size:24px;cursor:pointer;padding:4px;">&times;</button>
+                <div style="width:68px;height:68px;border-radius:16px;background:#0a192f;display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 4px 14px rgba(0,0,0,0.4);border:1px solid rgba(56,189,248,0.3);">
+                    <img src="icon-192.png" onerror="this.src='exologo.png'" style="width:48px;height:48px;object-fit:contain;" />
+                </div>
+                <h3 style="font-size:19px;font-weight:800;margin-bottom:6px;letter-spacing:-0.3px;">Install EXO ERP App</h3>
+                <p style="font-size:12px;color:#94a3b8;margin-bottom:16px;">Mobile me app install karne ke 3 aasaan steps:</p>
                 ${stepsHtml}
-                <button onclick="document.getElementById('exo-pwa-guide-modal').remove()" style="width:100%;padding:12px;border-radius:10px;background:linear-gradient(135deg, #0ea5e9, #6366f1);color:#fff;font-weight:700;border:none;cursor:pointer;">Got it</button>
+                <button onclick="document.getElementById('exo-pwa-guide-modal').remove()" style="width:100%;padding:12px;border-radius:12px;background:linear-gradient(135deg, #0ea5e9, #6366f1);color:#fff;font-weight:700;font-size:14px;border:none;cursor:pointer;box-shadow:0 4px 14px rgba(14,165,233,0.35);">Samajh Gaya / Got It</button>
             </div>
         `;
         document.body.appendChild(modal);

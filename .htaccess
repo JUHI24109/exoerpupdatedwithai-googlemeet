@@ -4,6 +4,8 @@ RewriteEngine On
 # PWA Manifest & Service Worker routing
 RewriteRule ^manifest\.json$ frontend/manifest.json [L]
 RewriteRule ^sw\.js$ frontend/sw.js [L]
+RewriteRule ^icon-192\.png$ frontend/icon-192.png [L]
+RewriteRule ^icon-512\.png$ frontend/icon-512.png [L]
 
 # Route all /api/ requests to our PHP proxy
 RewriteRule ^api/(.*)$ api.php [L,QSA]

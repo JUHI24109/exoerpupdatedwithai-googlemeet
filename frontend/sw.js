@@ -4,16 +4,18 @@
  * Desktop (Windows, macOS, Linux) and Mobile (Android, iOS).
  */
 
-const CACHE_NAME = 'exo-erp-pwa-v1';
+const CACHE_NAME = 'exo-erp-pwa-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
+  '/frontend/index.html',
   '/manifest.json',
-  '/exologo.png',
-  '/css/styles.css',
-  '/js/sidebar.js',
-  '/js/nav-sync.js',
-  '/js/notifications.js'
+  '/frontend/manifest.json',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/frontend/icon-192.png',
+  '/frontend/icon-512.png',
+  '/exologo.png'
 ];
 
 // Install: Cache core app shell
