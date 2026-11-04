@@ -8,7 +8,7 @@ $dir = __DIR__;
 $envFile = $dir . '/backend/.env';
 
 if (!file_exists($envFile)) {
-    $defaultEnv = "PORT=5000\n" .
+    $defaultEnv = "PORT=5002\n" .
                   "JWT_SECRET=exo-erp-production-secret-auth-key-2026\n" .
                   "DB_HOST=localhost\n" .
                   "DB_PORT=3306\n" .

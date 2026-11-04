@@ -3,7 +3,7 @@
 error_reporting(0);
 ini_set('display_errors', 0);
 
-$backendUrl = "http://127.0.0.1:5000";
+$backendUrl = "http://127.0.0.1:5002";
 
 $requestUri = $_SERVER['REQUEST_URI']; 
 
