@@ -1,9 +1,10 @@
 const fs = require('fs');
 const path = require('path');
-const archiver = require('archiver');
 const { Op } = require('sequelize');
 
 async function createUserBackup(employeeId, sequelizeModels) {
+    const archiverPkg = await import('archiver');
+    const archiver = archiverPkg.default || archiverPkg;
     const { User, Task, Ticket, Attendance } = sequelizeModels;
     
     // 1. Fetch User Data

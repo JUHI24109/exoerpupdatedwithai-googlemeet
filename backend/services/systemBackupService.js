@@ -1,7 +1,6 @@
 // backend/services/systemBackupService.js
 const fs = require('fs');
 const path = require('path');
-const archiver = require('archiver');
 
 /**
  * Creates a full system backup ZIP containing:
@@ -10,6 +9,8 @@ const archiver = require('archiver');
  * Returns the absolute path to the created ZIP file.
  */
 async function createSystemBackup() {
+  const archiverPkg = await import('archiver');
+  const archiver = archiverPkg.default || archiverPkg;
   // 2. Prepare backup folder
   const backupDir = path.join(__dirname, '..', 'backups');
   if (!fs.existsSync(backupDir)) fs.mkdirSync(backupDir, { recursive: true });
