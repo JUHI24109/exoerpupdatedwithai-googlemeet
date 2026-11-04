@@ -194,30 +194,4 @@ function showToast(notif) {
 // Auto-init
 document.addEventListener('DOMContentLoaded', () => {
     initNotifications();
-
-    // Dynamically inject Undertakings nav link for executives across all pages
-    const userStr = localStorage.getItem('user');
-    if (userStr) {
-        const user = JSON.parse(userStr);
-        if (['HR', 'HR Manager', 'CEO', 'Chairman'].includes(user.role)) {
-            const navList = document.querySelector('.nav-list');
-            if (navList && !document.getElementById('navUndertakings') && !document.getElementById('navUndertakingsGlobal')) {
-                const undertakingsLink = document.createElement('a');
-                undertakingsLink.href = 'undertakings.html';
-                undertakingsLink.className = 'nav-link';
-                if (window.location.pathname.includes('undertakings.html')) {
-                    undertakingsLink.classList.add('active');
-                }
-                undertakingsLink.id = 'navUndertakingsGlobal';
-                undertakingsLink.innerHTML = '<i class="fa-solid fa-handshake"></i> Undertakings';
-                
-                const flexSpacer = navList.querySelector('div[style*="flex:1"]') || navList.querySelector('div[style*="flex: 1"]');
-                if (flexSpacer) {
-                    navList.insertBefore(undertakingsLink, flexSpacer);
-                } else {
-                    navList.appendChild(undertakingsLink);
-                }
-            }
-        }
-    }
 });

@@ -902,7 +902,6 @@
         `;
         document.body.appendChild(modal);
     }
-    }
 
     // Mobile Sidebar Drawer Toggle & Backdrop
     window.toggleMobileSidebar = function (open) {

@@ -415,12 +415,6 @@
         document.getElementById('greeting').innerText = greetingText;
         document.getElementById('dashboardTitle').innerText = titleText;
         
-        if (['HR', 'HR Manager', 'CEO', 'Chairman', 'IT Admin'].includes(user.role)) {
-            const elU = document.getElementById('navUndertakings'); if (elU) elU.style.display = 'flex';
-            const elL = document.getElementById('navLeaves'); if (elL) elL.style.display = 'flex';
-            const elH = document.getElementById('navHolidays'); if (elH) elH.style.display = 'flex';
-        }
-        
         // Ensure nav links use unified dashboard
         const navLinks = document.querySelectorAll('.nav-link');
         navLinks.forEach(link => {
