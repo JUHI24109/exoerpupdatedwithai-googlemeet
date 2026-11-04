@@ -80,11 +80,15 @@ async function generateProjectId() {
 // Helper to find project member IDs
 async function getProjectMemberIds(projectId) {
   try {
+    const ids = [];
     const members = await ProjectMember.findAll({ where: { projectId }, attributes: ['userId'] });
-    const project = await Project.findByPk(projectId, { attributes: ['createdBy', 'projectManagerId'] });
-    const ids = members.map(m => m.userId);
-    if (project && project.createdBy) ids.push(project.createdBy);
-    if (project && project.projectManagerId) ids.push(project.projectManagerId);
+    members.forEach(m => ids.push(m.userId));
+
+    const project = await Project.findByPk(projectId, { attributes: ['creatorId', 'projectManagerId'] });
+    if (project) {
+      if (project.creatorId) ids.push(project.creatorId);
+      if (project.projectManagerId) ids.push(project.projectManagerId);
+    }
 
     // Include Super Roles (Chairman, CEO, IT Admin) so executives receive real-time notifications & badges
     const superUsers = await User.findAll({
@@ -95,6 +99,7 @@ async function getProjectMemberIds(projectId) {
 
     return [...new Set(ids)];
   } catch (e) {
+    console.error('getProjectMemberIds error:', e);
     return [];
   }
 }
