@@ -1,0 +1,14 @@
+{
+  "customFacts": [],
+  "lastTrainedAt": "2026-10-23T10:34:55.909Z",
+  "trainedStats": {
+    "totalEmployees": 5,
+    "totalTickets": 0,
+    "openTickets": 0,
+    "totalTasks": 0,
+    "pendingLeaves": 0,
+    "todayPresent": 0,
+    "todayAttendancePct": 0,
+    "customFactsCount": 0
+  }
+}

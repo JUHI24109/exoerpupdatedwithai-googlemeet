@@ -1,0 +1,25 @@
+node_modules/
+backend/node_modules/
+.env
+backend/.env
+uploads/
+backend/uploads/
+.kilocode/
+
+# SQLite & databases
+*.sqlite
+backend/*.sqlite
+backend/database.sqlite
+backend/exo.sqlite
+backend/scratch/
+
+# Logs & temp
+*.log
+backend_log.txt
+startup.sh
+*.zip
+node-v18/
+
+# Backups
+backend/backups/
+legacy/

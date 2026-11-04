@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Employee Profile Mapping | EXO GLOBAL</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --border: #cbd5e1;
+            --border-soft: #e2e8f0;
+            --text-main: #1e293b;
+            --text-light: #64748b;
+            --primary: #000080;
+            --primary-dark: #000066;
+            --accent: #3b82f6;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --warning: #f59e0b;
+            --pink-bg: #eff6ff;
+            --pink-light: #dbeafe;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; font-size: 13px; }
+
+        /* Sidebar - Consistent styling */
+        #sidebar { width: 250px; background: #fff; border-right: 2px solid var(--border-soft); display: flex; flex-direction: column; flex-shrink: 0; }
+        .logo { height: 72px; padding: 0 22px; border-bottom: 1px solid var(--border-soft); display: flex; align-items: center; gap: 12px; }
+        .logo-text { font-family: "Outfit", sans-serif; font-weight: 800; font-size: 18px; color: var(--primary); }
+        nav { flex: 1; padding: 18px 12px; display: flex; flex-direction: column; gap: 6px; }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-radius: 10px; color: var(--primary-dark); text-decoration: none; font-weight: 600; transition: .2s; border: 1px solid transparent; font-size: 13px; }
+        .nav-item i { width: 18px; text-align: center; font-size: 15px; }
+        .nav-item:hover { background: var(--pink-bg); border-color: var(--border-soft); color: var(--primary-dark); }
+        .nav-item.active { background: var(--pink-bg); border: 1px solid var(--border); box-shadow: inset 3px 0 0 var(--primary); color: var(--primary-dark); }
+
+        /* Main Workspace */
+        main { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; background: #fefefe; }
+        header { height: 72px; border-bottom: 2px solid var(--border-soft); padding: 0 26px; display: flex; align-items: center; justify-content: space-between; background: #fff; }
+        header h1 { font-family: 'Outfit'; font-weight: 800; font-size: 22px; color: var(--primary); }
+        
+        .topbar-right { display: flex; align-items: center; gap: 16px; }
+        .search-container { display: flex; align-items: center; background: #f8fafc; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border-soft); min-width: 300px; }
+        .search-container input { border: none; background: transparent; outline: none; width: 100%; margin-left: 8px; font-family: inherit; font-size: 13px; }
+
+        /* Content Scroll Panel */
+        .workspace { flex: 1; overflow-y: auto; padding: 26px; }
+        .employees-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+        
+        /* Employee Premium Card */
+        .emp-card { background: var(--surface); border: 2px solid var(--border-soft); border-radius: 16px; padding: 22px; display: flex; flex-direction: column; align-items: center; text-align: center; cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .emp-card:hover { border-color: var(--primary); transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,128,0.06); }
+        
+        .emp-avatar { width: 64px; height: 64px; border-radius: 20px; background: linear-gradient(135deg, var(--primary), var(--accent)); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: 800; font-family: 'Outfit'; margin-bottom: 14px; box-shadow: 0 4px 10px rgba(0,0,128,0.15); }
+        .emp-name { font-family: 'Outfit'; font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
+        .emp-role { font-size: 11px; font-weight: 700; background: var(--pink-bg); color: var(--primary); padding: 4px 12px; border-radius: 30px; display: inline-block; margin-bottom: 12px; border: 1px solid var(--pink-light); }
+        .emp-details { width: 100%; text-align: left; border-top: 1px solid var(--border-soft); padding-top: 12px; margin-top: 6px; }
+        .emp-detail-row { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 6px; color: var(--text-light); }
+        .emp-detail-row strong { color: var(--text-main); }
+
+        /* Report Modal Styling */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.6); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(6px); }
+        .modal-box { background: white; border-radius: 24px; width: min(850px, 92vw); max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); animation: modalIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes modalIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .modal-header { padding: 25px 30px; border-bottom: 1px solid var(--border-soft); display: flex; align-items: center; gap: 18px; position: relative; background: #fafafa; }
+        .modal-avatar { width: 56px; height: 56px; border-radius: 16px; background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; font-family: 'Outfit'; }
+        .modal-title-area { flex: 1; }
+        .close-btn { position: absolute; right: 25px; top: 25px; border: none; background: #f1f5f9; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text-light); transition: 0.2s; }
+        .close-btn:hover { background: var(--pink-light); color: var(--primary); }
+
+        .modal-body { flex: 1; overflow-y: auto; padding: 30px; display: flex; flex-direction: column; gap: 20px; }
+        
+        /* Stats Dashboard Row */
+        .report-stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .stat-card { border: 1px solid var(--border-soft); border-radius: 12px; padding: 14px; background: #f8fafc; }
+        .stat-title { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-light); letter-spacing: 0.5px; }
+        .stat-val { font-family: 'Outfit'; font-size: 22px; font-weight: 800; color: var(--text-main); margin-top: 4px; }
+
+        /* Report Details Workspace Grid */
+        .report-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px; }
+        .report-column-left { grid-column: span 4; display: flex; flex-direction: column; gap: 15px; }
+        .report-column-right { grid-column: span 8; border: 1px solid var(--border-soft); border-radius: 14px; padding: 20px; display: flex; flex-direction: column; min-height: 350px; }
+
+        .info-block { border: 1px solid var(--border-soft); border-radius: 12px; padding: 16px; background: #fff; }
+        .info-block h4 { font-family: 'Outfit'; color: var(--primary); font-size: 13px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        
+        .report-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--border-soft); padding-bottom: 10px; margin-bottom: 15px; }
+        .report-tab-btn { border: none; background: transparent; padding: 6px 14px; font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; color: var(--text-light); border-radius: 6px; transition: 0.2s; }
+        .report-tab-btn.active { background: var(--pink-bg); color: var(--primary); }
+
+        .tab-content { display: none; flex: 1; overflow-y: auto; max-height: 250px; }
+        .tab-content.active { display: block; }
+
+        .report-item { padding: 10px 12px; border: 1px solid var(--border-soft); border-radius: 8px; background: #fff; margin-bottom: 8px; font-size: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .report-badge { padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; }
+    
+/* ── SIDEBAR ── */
+#sidebar{width:250px;background:#1e293b;border-right:2px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
+@media (min-width: 769px) { #sidebar { height: 100vh; position: sticky; top: 0; } }
+.logo{height:100px;padding:0 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;justify-content:flex-start;}
+.logo-icon{width:52px;height:52px;border-radius:8px;background:transparent;display:flex;align-items:center;justify-content:center;overflow:hidden;border:none}
+.logo-icon img{width:100%;height:100%;object-fit:contain;border-radius:8px}
+.logo-text{font-family:'Outfit',sans-serif;font-size:18px;font-weight:800;color:#fff}
+#sidebar nav{flex:1;padding:18px 12px;display:flex;flex-direction:column;gap:6px;overflow-y:auto;}
+.nav-link{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:4px;color:#ffffff;text-decoration:none;font-weight:600;transition:.2s;border:1px solid transparent;font-size:13px}
+.nav-link:hover{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.05)}
+.nav-link.active{background:rgba(14,165,233,0.15);border:1px solid var(--primary);box-shadow:inset 3px 0 0 var(--primary)}
+.nav-link .count-badge{background:var(--primary);color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:99px;margin-left:auto}
+
+</style>
+</head>
+<body>
+    <!-- Sidebar -->
+    
+<aside id="sidebar">
+    <div class="logo"><img src="exologo.png?v=2" class="sidebar-logo" style="width:80px;height:80px;border-radius:8px;object-fit:contain;"/></div>
+    <nav>
+        <a href="dashboard.html" class="nav-link"><i class="fa-solid fa-house"></i> Dashboard</a>
+        <a href="employees.html" class="nav-link"><i class="fa-solid fa-users"></i> Employees</a>
+        <a href="attendance.html" class="nav-link"><i class="fa-solid fa-user-check"></i> Attendance</a>
+        <a href="tickets.html" class="nav-link"><i class="fa-solid fa-ticket"></i> Tickets</a>
+        <a href="chat.html" class="nav-link"><i class="fa-solid fa-message"></i> Chat</a>
+        <a href="meeting.html" class="nav-link"><i class="fa-solid fa-video"></i> Live Meeting</a>
+        <a href="documents.html" class="nav-link"><i class="fa-solid fa-folder-open"></i> Documents</a>
+        <a href="history.html" class="nav-link"><i class="fa-solid fa-clock-rotate-left"></i> History Center</a>
+        <a href="undertakings.html" class="nav-link" id="navUndertakings" style="display:none;"><i class="fa-solid fa-handshake"></i> Undertakings</a>
+        <div style="flex:1"></div>
+        <a href="profile.html" class="nav-link"><i class="fa-solid fa-id-badge"></i> My Profile</a>
+        <a href="javascript:void(0)" onclick="logout()" class="nav-link" style="color:var(--danger)"><i class="fa-solid fa-power-off"></i> Logout</a>
+    </nav>
+</aside>
+
+
+    <!-- Main Workspace -->
+    <main>
+        <header>
+            <h1>Employee Profile Mapping</h1>
+            <div class="topbar-right">
+                <div class="search-container">
+                    <i class="fa-solid fa-magnifying-glass" style="color:var(--text-light);"></i>
+                    <input type="text" id="empSearch" placeholder="Search employees by ID, name, role..." oninput="filterEmployees()">
+                </div>
+            </div>
+        </header>
+
+        <div class="workspace">
+            <div class="employees-grid" id="employeesGrid">
+                <div style="text-align:center; padding:50px; color:var(--text-light); grid-column:span 4;">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size:32px; margin-bottom:12px; color:var(--accent);"></i>
+                    <p>Loading staff intelligence directory...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Report Card Modal -->
+    <div class="modal" id="reportModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div class="modal-avatar" id="modalAv">H</div>
+                <div class="modal-title-area">
+                    <h2 style="font-family:'Outfit'; font-size:18px; font-weight:800; color:var(--primary);" id="modalName">HR Manager</h2>
+                    <p style="font-size:12px; color:var(--text-light);" id="modalRoleAndId">HR Department • EXO-201</p>
+                </div>
+                <button class="close-btn" onclick="closeModal()"><i class="fa-solid fa-times"></i></button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- Row 1: KPI Stats Grid -->
+                <div class="report-stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-title"><i class="fa-solid fa-calendar-check" style="color:var(--success);"></i> Attendance %</div>
+                        <div class="stat-val" id="statAtt">100%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title"><i class="fa-solid fa-list-check" style="color:var(--accent);"></i> Tasks Done</div>
+                        <div class="stat-val" id="statTasks">0 / 0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title"><i class="fa-solid fa-ticket" style="color:var(--warning);"></i> Active Tickets</div>
+                        <div class="stat-val" id="statTickets">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title"><i class="fa-solid fa-laptop" style="color:#7c3aed;"></i> Assigned Assets</div>
+                        <div class="stat-val" id="statAssets">0</div>
+                    </div>
+                </div>
+
+                <!-- Row 2: Grid Info Layout -->
+                <div class="report-grid">
+                    <!-- Column Left: Detailed Info -->
+                    <div class="report-column-left">
+                        <div class="info-block">
+                            <h4><i class="fa-solid fa-envelope"></i> Contact Details</h4>
+                            <p style="font-size:11px; margin-bottom:5px; color:var(--text-light);">Email: <strong id="detEmail" style="color:var(--text-main);"></strong></p>
+                            <p style="font-size:11px; color:var(--text-light);">Phone: <strong id="detPhone" style="color:var(--text-main);"></strong></p>
+                        </div>
+                        <div class="info-block">
+                            <h4><i class="fa-solid fa-building"></i> Employment Details</h4>
+                            <p style="font-size:11px; margin-bottom:5px; color:var(--text-light);">Joining: <strong id="detJoining" style="color:var(--text-main);"></strong></p>
+                            <p style="font-size:11px; color:var(--text-light);">Designation: <strong id="detDesig" style="color:var(--text-main);"></strong></p>
+                        </div>
+                        <div class="info-block">
+                            <h4><i class="fa-solid fa-credit-card"></i> Finance info</h4>
+                            <p style="font-size:11px; margin-bottom:5px; color:var(--text-light);">IBAN: <strong id="detIban" style="color:var(--text-main); font-size:10px;"></strong></p>
+                            <p style="font-size:11px; color:var(--text-light);">NIF: <strong id="detNif" style="color:var(--text-main);"></strong></p>
+                        </div>
+                    </div>
+
+                    <!-- Column Right: Detailed Feed Tabs -->
+                    <div class="report-column-right">
+                        <div class="report-tabs">
+                            <button class="report-tab-btn active" id="tabTasksBtn" onclick="switchReportTab('tasks')">Assigned Tasks</button>
+                            <button class="report-tab-btn" id="tabAttBtn" onclick="switchReportTab('att')">Attendance History</button>
+                            <button class="report-tab-btn" id="tabAssetsBtn" onclick="switchReportTab('assets')">undertaken Assets</button>
+                            <button class="report-tab-btn" id="tabLeavesBtn" onclick="switchReportTab('leaves')">Recent Leaves</button>
+                        </div>
+
+                        <!-- Tab Workspace -->
+                        <div class="tab-content active" id="tab-tasks">
+                            <div id="listTasks" style="display:flex; flex-direction:column; gap:8px;"></div>
+                        </div>
+                        <div class="tab-content" id="tab-att">
+                            <div id="listAtt" style="display:flex; flex-direction:column; gap:8px;"></div>
+                        </div>
+                        <div class="tab-content" id="tab-assets">
+                            <div id="listAssets" style="display:flex; flex-direction:column; gap:8px;"></div>
+                        </div>
+                        <div class="tab-content" id="tab-leaves">
+                            <div id="listLeaves" style="display:flex; flex-direction:column; gap:8px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/';
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+        let allEmployees = [];
+
+        async function init() {
+            try {
+                const res = await fetch('/api/auth/users', { headers: { Authorization: `Bearer ${token}` } });
+                allEmployees = await res.json();
+                renderEmployees();
+            } catch (e) {
+                console.error(e);
+                document.getElementById('employeesGrid').innerHTML = '<div style="color:var(--danger); text-align:center; width:100%; padding:20px;">Failed to load staff directory</div>';
+            }
+        }
+
+        function renderEmployees() {
+            const grid = document.getElementById('employeesGrid');
+            grid.innerHTML = '';
+            
+            if (allEmployees.length === 0) {
+                grid.innerHTML = '<div style="color:var(--text-light); text-align:center; grid-column:span 4; padding:50px;">No employees in directory yet.</div>';
+                return;
+            }
+
+            allEmployees.forEach(u => {
+                const card = document.createElement('div');
+                card.className = 'emp-card';
+                card.onclick = () => openReportCard(u.employeeId);
+                
+                const initials = u.fullName.charAt(0).toUpperCase();
+                const bgHue = (u.fullName.charCodeAt(0) * 31) % 360;
+                
+                card.innerHTML = `
+                    <div class="emp-avatar" style="background: hsl(${bgHue}, 60%, 45%)">${initials}</div>
+                    <div class="emp-name">${u.fullName}</div>
+                    <div class="emp-role">${u.role}</div>
+                    <div class="emp-details">
+                        <div class="emp-detail-row"><span>Employee ID:</span><strong>${u.employeeId}</strong></div>
+                        <div class="emp-detail-row"><span>Department:</span><strong>${u.department || '—'}</strong></div>
+                        <div class="emp-detail-row"><span>Designation:</span><strong>${u.designation || '—'}</strong></div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterEmployees() {
+            const query = document.getElementById('empSearch').value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.emp-card');
+            
+            cards.forEach((card, idx) => {
+                const emp = allEmployees[idx];
+                const match = emp.fullName.toLowerCase().includes(query) ||
+                              emp.employeeId.toLowerCase().includes(query) ||
+                              (emp.role || '').toLowerCase().includes(query) ||
+                              (emp.department || '').toLowerCase().includes(query);
+                card.style.display = match ? 'flex' : 'none';
+            });
+        }
+
+        async function openReportCard(employeeId) {
+            const modal = document.getElementById('reportModal');
+            modal.style.display = 'flex';
+            
+            // Set loading indicators inside modal
+            document.getElementById('modalName').innerText = 'Loading...';
+            document.getElementById('modalRoleAndId').innerText = '';
+            document.getElementById('statAtt').innerText = '—';
+            document.getElementById('statTasks').innerText = '—';
+            document.getElementById('statTickets').innerText = '—';
+            document.getElementById('statAssets').innerText = '—';
+
+            try {
+                const res = await fetch(`/api/auth/employee-report/${employeeId}`, { headers: { Authorization: `Bearer ${token}` } });
+                const data = await res.json();
+                
+                const emp = data.employee;
+                const stats = data.stats;
+                
+                // Header
+                document.getElementById('modalName').innerText = emp.fullName;
+                document.getElementById('modalRoleAndId').innerText = `${emp.designation || emp.role} • ID: ${emp.employeeId} • Dept: ${emp.department || 'General'}`;
+                
+                const initials = emp.fullName.charAt(0).toUpperCase();
+                const bgHue = (emp.fullName.charCodeAt(0) * 31) % 360;
+                const modalAv = document.getElementById('modalAv');
+                modalAv.innerText = initials;
+                modalAv.style.background = `hsl(${bgHue}, 60%, 45%)`;
+
+                // KPI Stats
+                document.getElementById('statAtt').innerText = `${stats.attendance.pct}%`;
+                document.getElementById('statTasks').innerText = `${stats.tasks.completed} / ${stats.tasks.total}`;
+                document.getElementById('statTickets').innerText = stats.tickets.total;
+                document.getElementById('statAssets').innerText = stats.assets.total;
+
+                // Contact & Detailed Details
+                document.getElementById('detEmail').innerText = emp.email || '—';
+                document.getElementById('detPhone').innerText = emp.phone || emp.whatsappNumber || '—';
+                document.getElementById('detJoining').innerText = emp.joiningDate ? new Date(emp.joiningDate).toLocaleDateString() : '—';
+                document.getElementById('detDesig').innerText = emp.designation || emp.role;
+                document.getElementById('detIban').innerText = emp.iban || '—';
+                document.getElementById('detNif').innerText = emp.nif || '—';
+
+                // Tabs List Populate
+                // Tasks
+                const listTasks = document.getElementById('listTasks');
+                listTasks.innerHTML = stats.tasks.list.length ? '' : '<div style="text-align:center; padding:15px; color:var(--text-light);">No tasks assigned</div>';
+                stats.tasks.list.forEach(t => {
+                    listTasks.innerHTML += `
+                        <div class="report-item">
+                            <div>
+                                <div style="font-weight:700;">${t.title}</div>
+                                <div style="font-size:10px; color:var(--text-light);">Priority: ${t.priority}</div>
+                            </div>
+                            <span class="report-badge" style="background:#e0f2fe; color:#0369a1;">${t.status}</span>
+                        </div>
+                    `;
+                });
+
+                // Attendance
+                const listAtt = document.getElementById('listAtt');
+                listAtt.innerHTML = stats.attendance.records.length ? '' : '<div style="text-align:center; padding:15px; color:var(--text-light);">No attendance records</div>';
+                stats.attendance.records.forEach(a => {
+                    const badgeStyle = a.status === 'Present' ? 'background:#dcfce7; color:#15803d;' : 'background:#fee2e2; color:#b91c1c;';
+                    listAtt.innerHTML += `
+                        <div class="report-item">
+                            <div>
+                                <div style="font-weight:700;">${a.date}</div>
+                                <div style="font-size:10px; color:var(--text-light);">Hours worked: ${a.hoursWorked.toFixed(2)}</div>
+                            </div>
+                            <span class="report-badge" style="${badgeStyle}">${a.status}</span>
+                        </div>
+                    `;
+                });
+
+                // Assets
+                const listAssets = document.getElementById('listAssets');
+                listAssets.innerHTML = stats.assets.list.length ? '' : '<div style="text-align:center; padding:15px; color:var(--text-light);">No assets assigned</div>';
+                stats.assets.list.forEach(asset => {
+                    listAssets.innerHTML += `
+                        <div class="report-item">
+                            <div>
+                                <div style="font-weight:700;">${asset.category} (${asset.makeModel || 'Undocumented'})</div>
+                                <div style="font-size:10px; color:var(--text-light);">S/N: ${asset.serialNumber || '—'}</div>
+                            </div>
+                            <span class="report-badge" style="background:#fef3c7; color:#d97706;">Received: ${asset.receivingDate}</span>
+                        </div>
+                    `;
+                });
+
+                // Leaves
+                const listLeaves = document.getElementById('listLeaves');
+                listLeaves.innerHTML = stats.leaves.list.length ? '' : '<div style="text-align:center; padding:15px; color:var(--text-light);">No leave requests found</div>';
+                stats.leaves.list.forEach(l => {
+                    const badgeStyle = l.status === 'Approved' ? 'background:#dcfce7; color:#15803d;' : l.status === 'Pending' ? 'background:#fef3c7; color:#d97706;' : 'background:#fee2e2; color:#b91c1c;';
+                    listLeaves.innerHTML += `
+                        <div class="report-item">
+                            <div>
+                                <div style="font-weight:700;">${l.startDate} → ${l.endDate}</div>
+                                <div style="font-size:10px; color:var(--text-light);">${l.reason}</div>
+                            </div>
+                            <span class="report-badge" style="${badgeStyle}">${l.status}</span>
+                        </div>
+                    `;
+                });
+
+            } catch (e) {
+                console.error(e);
+                alert('Server error loading employee details');
+                closeModal();
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('reportModal').style.display = 'none';
+        }
+
+        function switchReportTab(tab) {
+            ['tasks', 'att', 'assets', 'leaves'].forEach(t => {
+                document.getElementById(`tab-${t}`).style.display = t === tab ? 'block' : 'none';
+            });
+            document.querySelectorAll('.report-tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.id.toLowerCase().includes(tab));
+            });
+        }
+
+        init();
+    </script>
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/nav-sync.js"></script>
+</body>
+</html>

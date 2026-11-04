@@ -1,0 +1,7 @@
+# MySQL SSL configuration (require SSL for client connections)
+# Save this as mysql/conf.d/ssl.cnf and it will be mounted into the container.
+[mysqld]
+require_secure_transport = ON
+ssl_ca = /etc/mysql/certs/ca.pem
+ssl_cert = /etc/mysql/certs/server-cert.pem
+ssl_key = /etc/mysql/certs/server-key.pem

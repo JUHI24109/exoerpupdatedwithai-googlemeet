@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Undertakings | EXO GLOBAL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root{
+            --bg:#f8fafc;
+            --surface:#ffffff;
+            --border:#cbd5e1;
+            --border-soft:#e2e8f0;
+            --text-main:#1e293b;
+            --text-light:#64748b;
+            --primary:#000080;
+            --primary-dark:#000066;
+            --accent:#3b82f6;
+            --success:#16a34a;
+            --danger:#dc2626;
+            --warning:#f59e0b;
+            --pink-bg:#eff6ff;
+            --pink-light:#dbeafe;
+        }
+        body { margin:0; background:var(--bg); font-family:'Inter',sans-serif; display:flex; height:100vh; overflow:hidden; color:var(--text-main); font-size:13px; }
+        
+        /* SIDEBAR */
+        #sidebar{width:250px;background:#fff;border-right:2px solid var(--border-soft);display:flex;flex-direction:column;flex-shrink:0}
+        .logo{height:72px;padding:0 22px;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;gap:12px}
+.logo-icon{width:52px;height:52px;border-radius:8px;background:transparent;display:flex;align-items:center;justify-content:center;overflow:hidden;border:none}
+        .logo-text{font-family:'Outfit',sans-serif;font-size:18px;font-weight:800;color:var(--primary)}
+        nav{flex:1;padding:18px 12px;display:flex;flex-direction:column;gap:6px; overflow-y:auto;}
+        .nav-link{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:10px;color:var(--primary-dark);text-decoration:none;font-weight:600;transition:.2s;border:1px solid transparent;font-size:13px}
+        .nav-link:hover{background:var(--pink-bg);border-color:var(--border-soft)}
+        .nav-link.active{background:var(--pink-bg);border:1px solid var(--border);box-shadow:inset 3px 0 0 var(--primary)}
+        
+        /* MAIN */
+        main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;background:#fefefe}
+        header{height:72px;border-bottom:2px solid var(--border-soft);padding:0 26px;display:flex;align-items:center;justify-content:space-between;background:#fff; flex-shrink:0;}
+        header h1{font-family:'Outfit',sans-serif;font-size:22px;color:var(--primary);font-weight:800}
+        .top-right{display:flex;align-items:center;gap:16px}
+        .top-right-profile{display:flex;align-items:center;gap:10px;padding-left:16px;border-left:1px solid var(--border-soft)}
+        .top-right-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#a855f7);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px}
+        
+        .content { flex:1; overflow-y:auto; padding:20px; }
+        
+        .card { background: var(--surface); border: 2px solid var(--border-soft); border-radius: 14px; display: flex; flex-direction: column; overflow: hidden; margin-bottom: 20px; }
+        .card-header { padding:16px 20px; border-bottom: 1px solid var(--border-soft); background:#fff; display:flex; justify-content:space-between; align-items:center; }
+        .card-title { font-size:16px; font-weight:700; color:var(--primary); font-family:'Outfit',sans-serif; }
+        .card-body { padding:20px; }
+
+        .toolbar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:14px; }
+        .input { padding:9px 12px; border:1px solid var(--border-soft); border-radius:8px; font-size:13px; font-family:'Inter',sans-serif; outline:none; transition:border-color .2s; }
+        .input:focus { border-color:var(--primary); }
+        .btn { border:none; border-radius:8px; padding:9px 14px; font-weight:700; cursor:pointer; font-size:12px; transition:all .1s; font-family:'Inter',sans-serif; }
+        .btn:active { transform:scale(.97); }
+        .btn-primary { background:linear-gradient(135deg,var(--primary),#a855f7); color:#fff; box-shadow:0 2px 10px rgba(0,0,128,.25); }
+        .btn-soft { background:var(--pink-bg); color:var(--primary); border:1px solid var(--border-soft); }
+        .btn-soft:hover { background:var(--pink-light); }
+        
+        table { width:100%; border-collapse:collapse; }
+        th, td { padding:12px 14px; border-bottom:1px solid var(--pink-light); text-align:left; vertical-align:top; font-size:13px; }
+        th { font-size:11px; color:var(--text-light); text-transform:uppercase; letter-spacing:.5px; background:var(--pink-bg); font-weight:700; }
+        tr:hover td { background:var(--pink-bg); }
+        .badge { display:inline-block; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:700; }
+        .badge-ok { background:#dcfce7; color:#166534; }
+    
+/* ── SIDEBAR ── */
+#sidebar{width:250px;background:#1e293b;border-right:2px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
+@media (min-width: 769px) { #sidebar { height: 100vh; position: sticky; top: 0; } }
+.logo{height:100px;padding:0 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;justify-content:flex-start;}
+.logo-icon{width:52px;height:52px;border-radius:8px;background:transparent;display:flex;align-items:center;justify-content:center;overflow:hidden;border:none}
+.logo-icon img{width:100%;height:100%;object-fit:contain;border-radius:8px}
+.logo-text{font-family:'Outfit',sans-serif;font-size:18px;font-weight:800;color:#fff}
+#sidebar nav{flex:1;padding:18px 12px;display:flex;flex-direction:column;gap:6px;overflow-y:auto;}
+.nav-link{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:4px;color:#ffffff;text-decoration:none;font-weight:600;transition:.2s;border:1px solid transparent;font-size:13px}
+.nav-link:hover{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.05)}
+.nav-link.active{background:rgba(14,165,233,0.15);border:1px solid var(--primary);box-shadow:inset 3px 0 0 var(--primary)}
+.nav-link .count-badge{background:var(--primary);color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:99px;margin-left:auto}
+
+</style>
+</head>
+<body>
+
+
+<aside id="sidebar">
+    <div class="logo"><img src="exologo.png?v=2" class="sidebar-logo" style="width:80px;height:80px;border-radius:8px;object-fit:contain;"/></div>
+    <nav>
+        <a href="dashboard.html" class="nav-link"><i class="fa-solid fa-house"></i> Dashboard</a>
+        <a href="employees.html" class="nav-link"><i class="fa-solid fa-users"></i> Employees</a>
+        <a href="attendance.html" class="nav-link"><i class="fa-solid fa-user-check"></i> Attendance</a>
+        <a href="tickets.html" class="nav-link"><i class="fa-solid fa-ticket"></i> Tickets</a>
+        <a href="chat.html" class="nav-link"><i class="fa-solid fa-message"></i> Chat</a>
+        <a href="meeting.html" class="nav-link"><i class="fa-solid fa-video"></i> Live Meeting</a>
+        <a href="documents.html" class="nav-link"><i class="fa-solid fa-folder-open"></i> Documents</a>
+        <a href="history.html" class="nav-link"><i class="fa-solid fa-clock-rotate-left"></i> History Center</a>
+        <a href="undertakings.html" class="nav-link" id="navUndertakings" style="display:none;"><i class="fa-solid fa-handshake"></i> Undertakings</a>
+        <div style="flex:1"></div>
+        <a href="profile.html" class="nav-link"><i class="fa-solid fa-id-badge"></i> My Profile</a>
+        <a href="javascript:void(0)" onclick="logout()" class="nav-link" style="color:var(--danger)"><i class="fa-solid fa-power-off"></i> Logout</a>
+    </nav>
+</aside>
+
+
+<main>
+    <header>
+        <h1 id="pageTitle">Company Undertakings</h1>
+        <div class="top-right">
+            <i class="fa-regular fa-bell" style="font-size:20px;color:var(--primary);cursor:pointer"></i>
+            <div class="top-right-profile">
+                <div style="text-align:right">
+                    <div style="font-weight:700;font-size:13px;color:var(--primary)" id="userName">User</div>
+                    <div style="font-size:11px;color:var(--text-light)" id="userRoleTitle">Role</div>
+                </div>
+                <div class="top-right-avatar" id="userInitial">U</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="content">
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><i class="fa-solid fa-handshake" style="color:var(--primary)"></i> Assets Undertakings Overview</div>
+            </div>
+            <div class="card-body">
+                <div class="toolbar" style="justify-content:space-between;">
+                    <div style="display:flex;gap:10px;align-items:center;">
+                        <span style="font-size:12px; font-weight:600; color:var(--text-light);">Search:</span>
+                        <input type="text" id="searchInput" class="input" placeholder="Search employee..." oninput="filterTable()">
+                        <span style="font-size:12px; font-weight:600; color:var(--text-light); margin-left:10px;">Category:</span>
+                        <select id="categoryFilter" class="input" onchange="filterTable()">
+                            <option value="">All Categories</option>
+                            <option value="Mobile">Mobile</option>
+                            <option value="Laptop">Laptop</option>
+                            <option value="Desktop">Desktop</option>
+                            <option value="ID Card">ID Card</option>
+                            <option value="Health Insurance">Health Insurance</option>
+                            <option value="Accidental Insurance">Accidental Insurance</option>
+                            <option value="Via Verde">Via Verde</option>
+                        </select>
+                    </div>
+                    <div style="display:flex;gap:10px;align-items:center;">
+                        <input type="month" id="assetMonth" class="input" />
+                        <button class="btn btn-soft" onclick="openAddModal()"><i class="fa-solid fa-plus"></i> Add New</button>
+                        <button class="btn btn-primary" onclick="downloadAssets()"><i class="fa-solid fa-download"></i> Download Excel</button>
+                    </div>
+                </div>
+                
+                <div style="overflow-x:auto; border:1px solid var(--border-soft); border-radius:10px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Employee</th>
+                                <th>Category</th>
+                                <th>Details (Make / Serial / Card)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="assetsTableBody">
+                            <tr><td colspan="4" style="text-align:center; padding:30px; color:var(--text-light);">Loading assets...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<!-- Add Modal -->
+<div id="addModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+    <div class="card" style="width:400px; max-width:90%; background:white;">
+        <div class="card-header">
+            <div class="card-title">Add Undertaking</div>
+            <i class="fa-solid fa-times" style="cursor:pointer;color:var(--text-light);" onclick="closeAddModal()"></i>
+        </div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
+            <input type="text" id="addEmpId" class="input" placeholder="Employee ID (e.g. EXO-101)" required>
+            <input type="text" id="addEmpName" class="input" placeholder="Employee Name" required>
+            <select id="addCat" class="input" required>
+                <option value="">Select Category</option>
+                <option value="Mobile">Mobile</option>
+                <option value="Laptop">Laptop</option>
+                <option value="Desktop">Desktop</option>
+                <option value="ID Card">ID Card</option>
+                <option value="Health Insurance">Health Insurance</option>
+                <option value="Accidental Insurance">Accidental Insurance</option>
+            </select>
+            <input type="text" id="addDetails" class="input" placeholder="Details (Make / Serial / Card No.)">
+            <input type="date" id="addDate" class="input" required>
+            <button class="btn btn-primary" onclick="submitAdd()" style="margin-top:10px;">Save Undertaking</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/';
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    
+    document.getElementById('userName').innerText = user.name || user.fullName || 'User';
+    document.getElementById('userInitial').innerText = (user.name || user.fullName || 'U').charAt(0).toUpperCase();
+    document.getElementById('userRoleTitle').innerText = user.role || 'Executive';
+
+    const isExecutive = ['CEO', 'Chairman', 'IT Admin', 'HR Manager', 'HR'].includes(user.role);
+    if (!isExecutive) {
+        document.body.innerHTML = '<h2 style="padding:40px;text-align:center;color:red;">Unauthorized Access</h2>';
+    }
+
+    function getDashboardLink() {
+        if(user.role === 'Chairman') return 'dashboard.html';
+        if(user.role === 'CEO') return 'dashboard.html';
+        if(user.role === 'IT Admin') return 'dashboard.html';
+        if(['HR', 'HR Manager'].includes(user.role)) return 'dashboard.html';
+        return 'dashboard.html';
+    }
+
+    const nav = document.getElementById('navLinks');
+    nav.innerHTML = `
+        <a href="${getDashboardLink()}" class="nav-link"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+        <a href="employees.html" class="nav-link"><i class="fa-solid fa-users"></i> Employees</a>
+        <a href="attendance.html" class="nav-link"><i class="fa-solid fa-user-check"></i> Attendance</a>
+        <a href="tickets.html" class="nav-link"><i class="fa-solid fa-ticket"></i> Tickets</a>
+        <a href="chat.html" class="nav-link"><i class="fa-solid fa-message"></i> Chat</a>
+        <a href="undertakings.html" class="nav-link active"><i class="fa-solid fa-handshake"></i> Undertakings</a>
+        <div style="flex:1"></div>
+        <a href="javascript:void(0)" onclick="logout()" class="nav-link" style="color:var(--danger)"><i class="fa-solid fa-power-off"></i> Logout</a>
+    `;
+
+    function logout() { localStorage.clear(); window.location.href = '/'; }
+
+    let allAssets = [];
+
+    async function loadAssets() {
+        try {
+            const res = await fetch('/api/assets', { headers: { Authorization: `Bearer ${token}` } });
+            allAssets = await res.json();
+            renderAssets(allAssets);
+        } catch(e) { console.error(e); }
+    }
+
+    function renderAssets(data) {
+        const body = document.getElementById('assetsTableBody');
+        body.innerHTML = '';
+        if(data.length === 0) {
+            body.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:30px; color:var(--text-light);">No undertakings found.</td></tr>';
+            return;
+        }
+        data.forEach(r => {
+            const details = r.makeModel || r.serialNumber || r.cardNumber || '-';
+            body.innerHTML += `<tr>
+                <td>${r.receivingDate}</td>
+                <td><div style="font-weight:700;">${r.employeeName}</div><div style="font-size:10px;color:var(--text-light);">${r.employeeId}</div></td>
+                <td><span class="badge badge-ok">${r.category}</span></td>
+                <td><div style="max-width:300px;overflow-wrap:break-word;">${details}</div></td>
+            </tr>`;
+        });
+    }
+
+    function filterTable() {
+        const term = document.getElementById('searchInput').value.toLowerCase();
+        const cat = document.getElementById('categoryFilter').value;
+
+        const filtered = allAssets.filter(r => {
+            const matchName = (r.employeeName || '').toLowerCase().includes(term) || (r.employeeId || '').toLowerCase().includes(term);
+            const matchCat = cat === '' || r.category === cat;
+            return matchName && matchCat;
+        });
+        renderAssets(filtered);
+    }
+
+    function downloadAssets() {
+        const month = document.getElementById('assetMonth').value || new Date().toISOString().slice(0,7);
+        window.location.href = `/api/assets/report/monthly?month=${month}&token=${token}`;
+    }
+
+    // Set default month
+    document.getElementById('assetMonth').value = new Date().toISOString().slice(0,7);
+    document.getElementById('addDate').value = new Date().toISOString().split('T')[0];
+    loadAssets();
+
+    function openAddModal() {
+        document.getElementById('addModal').style.display = 'flex';
+    }
+    
+    function closeAddModal() {
+        document.getElementById('addModal').style.display = 'none';
+        document.getElementById('addEmpId').value = '';
+        document.getElementById('addEmpName').value = '';
+        document.getElementById('addCat').value = '';
+        document.getElementById('addDetails').value = '';
+    }
+
+    async function submitAdd() {
+        const payload = {
+            employeeId: document.getElementById('addEmpId').value,
+            employeeName: document.getElementById('addEmpName').value,
+            category: document.getElementById('addCat').value,
+            makeModel: document.getElementById('addDetails').value,
+            receivingDate: document.getElementById('addDate').value
+        };
+
+        if(!payload.employeeId || !payload.employeeName || !payload.category || !payload.receivingDate) {
+            return alert('Please fill all required fields');
+        }
+
+        try {
+            const res = await fetch('/api/assets', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify(payload)
+            });
+            if(res.ok) {
+                closeAddModal();
+                loadAssets();
+            } else {
+                const err = await res.json();
+                alert(err.error || 'Failed to add');
+            }
+        } catch(e) {
+            console.error(e);
+            alert('Network error');
+        }
+    }
+
+</script>
+<script src="/js/sidebar.js"></script>
+<script src="/js/nav-sync.js"></script>
+</body>
+</html>

@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard | EXO GLOBAL</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="css/responsive-universal.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    function emailBackup() {
+        document.getElementById('backupModal').style.display = 'flex';
+        document.getElementById('backupMessage').style.display = 'none';
+        document.getElementById('backupEmail').value = '';
+    }
+
+    async function processBackup() {
+        const targetEmail = document.getElementById('backupEmail').value.trim();
+        const msgBox = document.getElementById('backupMessage');
+
+        if (!targetEmail) {
+            msgBox.style.display = 'block';
+            msgBox.style.color = 'var(--danger)';
+            msgBox.innerText = 'Please provide an email address.';
+            return;
+        }
+
+        const btn = document.getElementById('backupSubmitBtn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+        btn.disabled = true;
+        msgBox.style.display = 'block';
+        msgBox.style.color = 'var(--text-light)';
+        msgBox.innerText = 'Extracting data... This may take a minute.';
+
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch('/api/backup/system', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ targetEmail })
+            });
+            const data = await res.json();
+            
+            if (!res.ok) {
+                msgBox.style.color = 'var(--danger)';
+                msgBox.innerText = 'Backup Failed: ' + (data.error || 'Unknown error');
+            } else {
+                msgBox.style.color = 'var(--success)';
+                msgBox.innerText = 'Success! Backup has been emailed.';
+                setTimeout(() => {
+                    document.getElementById('backupModal').style.display = 'none';
+                }, 3000);
+            }
+        } catch (e) {
+            console.error(e);
+            msgBox.style.color = 'var(--danger)';
+            msgBox.innerText = 'A network error occurred.';
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+</script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+
+:root{
+            --bg:#f1f5f9;
+            --surface:#ffffff;
+            --border:#334155;
+            --border-soft:#94a3b8;
+            --text-main:#1e293b;
+            --text-light:#64748b;
+            --primary:#1e293b;
+            --primary-dark:#0f172a;
+            --accent:#475569;
+            --success:#16a34a;
+            --danger:#dc2626;
+            --warning:#d97706;
+            --pink-bg:#f1f5f9;
+            --pink-light:#e2e8f0;
+        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-main);height:100vh;display:flex;overflow:hidden;font-size:13px}
+
+/* ── SIDEBAR ── */
+        #sidebar{width:250px;background:#1e293b;border-right:2px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+        .logo{height:100px;padding:0 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.logo-icon{width:52px;height:52px;border-radius:8px;background:transparent;display:flex;align-items:center;justify-content:center;overflow:hidden;border:none}
+        .logo-icon img{width:100%;height:100%;object-fit:contain;border-radius:8px}
+.logo-text{font-family:'Outfit',sans-serif;font-size:18px;font-weight:800;color:#fff}
+        nav{flex:1;padding:18px 12px;display:flex;flex-direction:column;gap:6px}
+.nav-link{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:4px;color:#ffffff;text-decoration:none;font-weight:600;transition:.2s;border:1px solid transparent;font-size:13px}
+        .nav-link:hover{background:var(--border-soft);border-color:var(--border)}
+        .nav-link.active{background:rgba(14,165,233,0.15);border:1px solid var(--primary);box-shadow:inset 3px 0 0 var(--primary)}
+        .nav-link .count-badge{background:var(--primary);color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:99px;margin-left:auto}
+
+/* ── MAIN ── */
+        main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;background:#f1f5f9}
+        header{height:72px;border-bottom:2px solid var(--border);padding:0 26px;display:flex;align-items:center;justify-content:space-between;background:var(--surface)}
+        header h1{font-family:'Outfit',sans-serif;font-size:22px;color:var(--primary);font-weight:800}
+        .top-right{display:flex;align-items:center;gap:16px}
+        .top-right-profile{display:flex;align-items:center;gap:10px;padding-left:16px;border-left:1px solid var(--border)}
+        .top-right-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#8b5cf6);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px}
+
+        /* ── DASHBOARD GRID ── */
+        .dashboard-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px}
+        .dashboard-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+        .bento-card{background:var(--surface);border:2px solid var(--border);border-radius: 6px;padding:16px;display:flex;flex-direction:column;transition:border-color .2s,box-shadow .2s}
+        .bento-card:hover{border-color:var(--primary);box-shadow:0 4px 20px rgba(14,165,233,0.15)}
+        .card-lg{grid-column:span 2}
+        .card-full{grid-column:span 4}
+        .card-tall{grid-row:span 2}
+.kpi-title{font-size:13px;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px}
+        .kpi-val{font-family:'Outfit',sans-serif;font-size:36px;font-weight:800;color:#1e293b}
+        .kpi-trend{font-size:11px;margin-top:6px;color:var(--success)}
+        .chart-container{position:relative;width:100%;height:220px}
+
+        /* ── STAFF PROFILES ── */
+        .activity-list{margin-top:8px;display:flex;flex-direction:column;gap:8px;overflow-y:auto;max-height:320px}
+        .activity-item{display:flex;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--border-soft);background:#fff;border-radius: 4px;transition:background .2s}
+        .activity-item:hover{background:var(--pink-bg)}
+        .user-dot{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;flex-shrink:0}
+
+        /* ── SECTIONS ── */
+        #leavesSection,#attendanceSection{display:none;flex-direction:column;flex:1;padding:20px;gap:14px;overflow-y:auto}
+        .panel{border:2px solid var(--border-soft);border-radius: 6px;padding:20px;background:#fff}
+        .panel h2{font-family:'Outfit',sans-serif;color:var(--primary);margin-bottom:14px;font-size:18px}
+        .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+        .input,select{padding:9px 12px;border:1px solid var(--border-soft);border-radius: 4px;font-size:13px;font-family:'Inter',sans-serif;outline:none;transition:border-color .2s}
+        .input:focus,select:focus{border-color:var(--primary)}
+        .btn{border:none;border-radius: 4px;padding:9px 14px;font-weight:700;cursor:pointer;font-size:12px;transition:transform .1s,box-shadow .2s;font-family:'Inter',sans-serif}
+        .btn:active{transform:scale(.97)}
+        .btn-primary{background:linear-gradient(135deg,var(--primary),#a855f7);color:#fff;box-shadow:0 2px 10px rgba(0,0,128,.25)}
+        .btn-success{background:var(--success);color:#fff}
+        .btn-danger{background:var(--danger);color:#fff}
+        .btn-warning{background:#7c3aed;color:#fff}
+        .btn-soft{background:var(--pink-bg);color:var(--primary);border:1px solid var(--border-soft)}
+        .btn-soft:hover{background:var(--pink-light)}
+
+        /* ── TABLE ── */
+        table{width:100%;border-collapse:collapse}
+        th,td{padding:12px 14px;border-bottom:1px solid var(--pink-light);text-align:left;vertical-align:top;font-size:13px}
+        th{font-size:11px;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;background:var(--pink-bg);font-weight:700}
+        tr:hover td{background:var(--pink-bg)}
+        .badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700}
+        .badge-pending{background:#fef3c7;color:#92400e}
+        .badge-ok{background:#dcfce7;color:#166534}
+        .badge-no{background:#fee2e2;color:#991b1b}
+        .badge-hold{background:#ede9fe;color:#5b21b6}
+
+        /* ── SCROLLBAR ── */
+        ::-webkit-scrollbar{width:6px}
+        ::-webkit-scrollbar-track{background:transparent}
+        ::-webkit-scrollbar-thumb{background:var(--border-soft);border-radius:99px}
+        ::-webkit-scrollbar-thumb:hover{background:var(--border)}
+    
+        .bento-card { background: var(--surface); border: 2px solid var(--border-soft); border-radius: 6px; padding: 16px; display: flex; flex-direction: column; transition: border-color .2s, box-shadow .2s; }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px; }
+        .dashboard-triple-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        @media (max-width: 1080px) {
+            .dashboard-triple-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .dashboard-triple-grid { grid-template-columns: 1fr !important; gap: 14px; }
+            .dashboard-grid { grid-template-columns: 1fr !important; }
+        }
+        @media (min-width: 480px) and (max-width: 768px) {
+            .dashboard-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        .kpi-title { font-size: 11px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: .7px; margin-bottom: 6px; }
+        .kpi-val { font-family: 'Outfit', sans-serif; font-size: 30px; font-weight: 800; color: #111827; }
+        .chart-container { position: relative; width: 100%; height: 220px; }
+    </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+    
+<aside id="sidebar">
+    <div class="logo"><img src="exologo.png?v=2" class="sidebar-logo" style="width:80px;height:80px;border-radius:8px;object-fit:contain;"/></div>
+    <nav>
+        <a href="dashboard.html" class="nav-link"><i class="fa-solid fa-house"></i> Dashboard</a>
+        <a href="employees.html" class="nav-link"><i class="fa-solid fa-users"></i> Employees</a>
+        <a href="attendance.html" class="nav-link"><i class="fa-solid fa-user-check"></i> Attendance</a>
+        <a href="tickets.html" class="nav-link"><i class="fa-solid fa-ticket"></i> Tickets</a>
+        <a href="chat.html" class="nav-link"><i class="fa-solid fa-message"></i> Chat</a>
+        <a href="meeting.html" class="nav-link"><i class="fa-solid fa-video"></i> Live Meeting</a>
+        <a href="documents.html" class="nav-link"><i class="fa-solid fa-folder-open"></i> Documents</a>
+        <a href="history.html" class="nav-link"><i class="fa-solid fa-clock-rotate-left"></i> History Center</a>
+        <a href="javascript:void(0)" onclick="showSection('leaves')" class="nav-link" id="navLeaves" style="display:none;"><i class="fa-solid fa-calendar-minus"></i> Leave Requests</a>
+        <a href="javascript:void(0)" onclick="showSection('holidays')" class="nav-link" id="navHolidays" style="display:none;"><i class="fa-solid fa-umbrella-beach"></i> Holidays</a>
+        <a href="undertakings.html" class="nav-link" id="navUndertakings" style="display:none;"><i class="fa-solid fa-handshake"></i> Undertakings</a>
+        <div style="flex:1"></div>
+        <a href="profile.html" class="nav-link"><i class="fa-solid fa-id-badge"></i> My Profile</a>
+        <a href="javascript:void(0)" onclick="logout()" class="nav-link" style="color:var(--danger)"><i class="fa-solid fa-power-off"></i> Logout</a>
+    </nav>
+</aside>
+
+
+    <main>
+        <header>
+            <h1 id="dashboardTitle">Command Center</h1>
+            <div class="top-right">
+<button onclick="emailBackup()" id="backupBtn" style="padding: 6px 12px; background: #10b981; color: white; border: none; border-radius: 4px; cursor:pointer; font-weight: 600; font-size: 11px; display:flex; align-items:center; gap:6px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);"><i class="fa-solid fa-envelope"></i> Email DB Backup</button>
+                <i class="fa-regular fa-bell" style="font-size:20px;color:var(--primary);cursor:pointer"></i>
+                <div class="top-right-profile">
+                    <div style="text-align:right">
+                        <div style="font-weight:700;font-size:13px;color:var(--primary)" id="userName">User</div>
+                    </div>
+                    <div class="top-right-avatar" id="userInitial">U</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-scroll" id="mainSection">
+            
+            <div style="margin-bottom:20px;">
+                <div id="greeting" style="font-size: 24px; font-weight: 800; font-family:'Outfit'; color: var(--primary);">Loading...</div>
+                <div style="font-size: 13px; color: var(--text-light); margin-top: 4px;" id="dateStr">Loading date...</div>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="dashboard-grid">
+                <div class="bento-card">
+                    <div class="kpi-title"><i class="fa-solid fa-users" style="color:var(--primary)"></i> Total Workforce</div>
+                    <div class="kpi-val" id="kpi-total-emp">0</div>
+                    <div class="kpi-trend"><i class="fa-solid fa-arrow-up" style="color:var(--success)"></i> Updated Live</div>
+                </div>
+                <div class="bento-card">
+                    <div class="kpi-title"><i class="fa-solid fa-user-check" style="color:var(--success)"></i> Present Today</div>
+                    <div class="kpi-val" id="kpi-present">0</div>
+                    <div class="kpi-trend" id="kpi-attendance-pct">0%</div>
+                </div>
+                <div class="bento-card">
+                    <div class="kpi-title"><i class="fa-solid fa-ticket" style="color:var(--accent)"></i> Raised Tickets</div>
+                    <div class="kpi-val" id="kpi-raised">0</div>
+                    <div class="kpi-trend">Total Active</div>
+                </div>
+                <div class="bento-card">
+                    <div class="kpi-title"><i class="fa-solid fa-spinner" style="color:var(--warning)"></i> Pending Tickets</div>
+                    <div class="kpi-val" id="kpi-pending">0</div>
+                    <div class="kpi-trend">Awaiting action</div>
+                </div>
+                <div class="bento-card">
+                    <div class="kpi-title"><i class="fa-solid fa-check-double" style="color:var(--success)"></i> Completed Tickets</div>
+                    <div class="kpi-val" id="kpi-finished">0</div>
+                    <div class="kpi-trend">Resolved</div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="dashboard-triple-grid" style="margin-bottom: 20px;">
+                <div class="bento-card">
+                    <div class="kpi-title">Ticket Status Distribution</div>
+                    <div class="chart-container"><canvas id="ticketLineChart"></canvas></div>
+                </div>
+                <div class="bento-card">
+                    <div class="kpi-title">Ticket Priorities</div>
+                    <div class="chart-container"><canvas id="priorityPieChart"></canvas></div>
+                </div>
+                <div class="bento-card">
+                    <div class="kpi-title">My Raised Tickets Status</div>
+                    <div class="chart-container"><canvas id="myRaisedChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- My To-Do + Reminders + Today's Operations -->
+            <div class="dashboard-triple-grid">
+                <!-- MY TO-DO LIST -->
+                <div class="bento-card" style="display:flex;flex-direction:column;gap:10px;">
+                    <div style="font-size:14px;font-weight:700;color:var(--primary);padding-bottom:8px;border-bottom:2px solid var(--border);">
+                        <i class="fa-solid fa-list-check"></i> My To-Do
+                    </div>
+                    <div style="display:flex;gap:6px;">
+                        <input type="text" id="dashTdTitle" placeholder="Add task..." style="flex:1;padding:8px 10px;font-size:12px;border:1px solid var(--border-soft);border-radius:4px;outline:none;">
+                        <button onclick="dashAddTodo()" style="background:var(--primary);color:white;border:none;border-radius:4px;padding:8px 12px;cursor:pointer;font-weight:600;font-size:11px;flex-shrink:0;">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+                    <div id="dashMyTodoList" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:6px;max-height:240px;min-height:80px;">
+                    </div>
+                </div>
+
+                <!-- REMINDERS -->
+                <div class="bento-card" style="display:flex;flex-direction:column;gap:10px;">
+                    <div style="font-size:14px;font-weight:700;color:var(--primary);padding-bottom:8px;border-bottom:2px solid var(--border);">
+                        <i class="fa-solid fa-bell"></i> Reminders
+                    </div>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+                        <input type="text" id="dashRemMsg" placeholder="Reminder title..." style="flex:2;min-width:130px;padding:8px 10px;font-size:12px;border:1px solid var(--border-soft);border-radius:4px;outline:none;">
+                        <input type="datetime-local" id="dashRemDate" style="flex:1;min-width:140px;padding:8px;font-size:12px;border:1px solid var(--border-soft);border-radius:4px;outline:none;">
+                        <button onclick="dashAddReminder()" style="background:var(--primary);color:white;border:none;border-radius:4px;padding:8px 12px;cursor:pointer;font-weight:600;font-size:11px;flex-shrink:0;">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+                    <div id="dashRemindersList" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:6px;max-height:240px;min-height:80px;">
+                    </div>
+                </div>
+
+                <!-- TODAY'S OPERATIONS -->
+                <div class="bento-card" style="display:flex;flex-direction:column;gap:10px;">
+                    <div style="font-size:14px;font-weight:700;color:var(--primary);padding-bottom:8px;border-bottom:2px solid var(--border);">
+                        <i class="fa-solid fa-bolt"></i> Today's Operations
+                    </div>
+                    <div style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:8px;">
+                        <div style="border:1px solid var(--border-soft);border-radius:6px;padding:10px;">
+                            <div style="font-size:11px;font-weight:700;color:var(--primary);margin-bottom:6px;">
+                                <i class="fa-solid fa-bell" style="color:#f59e0b;"></i> Today's Reminders
+                            </div>
+                            <div id="opsReminders" style="font-size:11px;color:var(--text-light);">No reminders today</div>
+                        </div>
+                        <div style="border:1px solid var(--border-soft);border-radius:6px;padding:10px;">
+                            <div style="font-size:11px;font-weight:700;color:var(--primary);margin-bottom:6px;">
+                                <i class="fa-solid fa-ticket" style="color:#3b82f6;"></i> Active Tickets
+                            </div>
+                            <div id="opsTickets" style="font-size:11px;color:var(--text-light);">Loading...</div>
+                        </div>
+                        <div style="border:1px solid var(--border-soft);border-radius:6px;padding:10px;">
+                            <div style="font-size:11px;font-weight:700;color:var(--primary);margin-bottom:6px;">
+                                <i class="fa-solid fa-comments" style="color:#10b981;"></i> Recent Messages
+                            </div>
+                            <div id="opsChat" style="font-size:11px;color:var(--text-light);">No new messages</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+</div>
+
+        </div>
+    
+<!-- ═══ LEAVES SECTION ═══ -->
+<section id="leavesSection" style="display:none;flex-direction:column;flex:1;padding:20px;gap:14px;overflow-y:auto;background:var(--bg);">
+    <div class="card" style="flex:1;">
+        <div class="card-header" style="font-size:18px; color:var(--primary);"><i class="fa-solid fa-calendar-minus"></i> Leave Requests</div>
+        <div class="card-body" style="padding:20px;">
+            <table style="width:100%; border-collapse:collapse;">
+                <thead>
+                    <tr style="background:var(--primary-light); color:var(--primary); font-size:12px; font-weight:700;">
+                        <th style="padding:10px;text-align:left">Employee</th>
+                        <th style="padding:10px;text-align:left">Type & Reason</th>
+                        <th style="padding:10px;text-align:left">Dates</th>
+                        <th style="padding:10px;text-align:center">Status</th>
+                        <th style="padding:10px;text-align:center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="hrLeavesTableBody">
+                    <tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text-light);">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ═══ HOLIDAYS SECTION ═══ -->
+<section id="holidaysSection" style="display:none;flex-direction:column;flex:1;padding:20px;gap:14px;overflow-y:auto;background:var(--bg);">
+    <div class="card" style="flex:1;">
+        <div class="card-header" style="font-size:18px; color:var(--primary);"><i class="fa-solid fa-umbrella-beach"></i> Manage Holidays</div>
+        <div class="card-body" style="padding:20px;">
+            <div style="display:flex; gap:10px; margin-bottom:20px;">
+                <input type="date" id="holDate" class="input">
+                <input type="text" id="holName" class="input" placeholder="Holiday Name..." style="flex:1;">
+                <select id="holType" class="input"><option value="Public">Public</option><option value="Company">Company</option></select>
+                <button class="btn" style="background:var(--primary); color:white;" onclick="addHoliday()"><i class="fa-solid fa-plus"></i> Add Holiday</button>
+            </div>
+            <table style="width:100%; border-collapse:collapse;">
+                <thead>
+                    <tr style="background:var(--primary-light); color:var(--primary); font-size:12px; font-weight:700;">
+                        <th style="padding:10px;text-align:left">Date</th>
+                        <th style="padding:10px;text-align:left">Holiday Name</th>
+                        <th style="padding:10px;text-align:left">Type</th>
+                        <th style="padding:10px;text-align:center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="holidaysTableBody">
+                    <tr><td colspan="4" style="text-align:center;padding:20px;color:var(--text-light);">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ═══ MY TO-DO SECTION ═══ -->
+<section id="todoSection" style="display:none;flex-direction:column;flex:1;padding:20px;gap:14px;overflow-y:auto;background:var(--bg);">
+    <div class="card" style="flex:1;">
+        <div class="card-header" style="font-size:18px; color:var(--primary);"><i class="fa-solid fa-list-check"></i> My To-Do List</div>
+        <div class="card-body" style="padding:20px;">
+            <div style="display:flex; gap:10px; margin-bottom:20px;">
+                <input type="text" id="tdTitle" class="input" placeholder="Task description..." style="flex:1;">
+                <input type="month" id="tdMonth" class="input" title="Monthly Reminder Date">
+                <button class="btn" style="background:var(--primary); color:white;" onclick="saveTodo()"><i class="fa-solid fa-plus"></i> Add To-Do</button>
+            </div>
+            <div id="todoContainer" style="display:flex; flex-direction:column; gap:10px;">
+                <div style="color:var(--text-light); text-align:center;">Loading...</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+</main>
+
+    <script src="/api/socket.io/socket.io.js"></script>
+    <script src="js/notifications.js?v=3"></script>
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/';
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        document.getElementById('userName').innerText = user.name || user.fullName || 'User';
+        document.getElementById('userInitial').innerText = (user.name || user.fullName || 'U').charAt(0).toUpperCase();
+
+        // Dynamic greeting based on time of day
+        const empId = (user.employeeId || '').toUpperCase();
+        const h = new Date().getHours();
+        const greeting = h < 12 ? 'Good Morning' : h < 17 ? 'Good Afternoon' : 'Good Evening';
+        let greetingText = '';
+        let titleText = 'Command Center';
+        if (empId === 'EXO-001') { greetingText = `${greeting}, Mr. Chairman!`; titleText = 'Chairman Command Center'; }
+        else if (empId === 'EXO-002') { greetingText = `${greeting}, Mr. CEO!`; titleText = 'CEO Command Center'; }
+        else if (empId === 'EXO-101') { greetingText = `${greeting}, Mr. IT Admin!`; titleText = 'IT Admin Command Center'; }
+        else if (empId === 'EXO-201') { greetingText = `${greeting}, Ms. HR!`; titleText = 'HR Command Center'; }
+        else { greetingText = `${greeting}, ${user.name || user.fullName || 'Employee'}!`; titleText = 'Employee Dashboard'; }
+        
+        document.getElementById('greeting').innerText = greetingText;
+        document.getElementById('dashboardTitle').innerText = titleText;
+        
+        if (['HR', 'HR Manager', 'CEO', 'Chairman', 'IT Admin'].includes(user.role)) {
+            const elU = document.getElementById('navUndertakings'); if (elU) elU.style.display = 'flex';
+            const elL = document.getElementById('navLeaves'); if (elL) elL.style.display = 'flex';
+            const elH = document.getElementById('navHolidays'); if (elH) elH.style.display = 'flex';
+        }
+        
+        // Ensure nav links use unified dashboard
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+            if (link.innerText.includes('Dashboard')) {
+                link.href = 'dashboard.html';
+            }
+        });
+
+        function logout() { localStorage.clear(); window.location.href = '/'; }
+
+document.getElementById('dateStr').innerText = new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+        // Role-based visibility
+        const isExecutive = ['IT Admin', 'CEO', 'Chairman'].includes(user.role);
+        const isHR = ['HR', 'HR Manager'].includes(user.role);
+        
+        // Hide backup button for non-executives
+        if (!isExecutive) {
+            const backupBtn = document.getElementById('backupBtn');
+            if (backupBtn) backupBtn.style.display = 'none';
+        }
+        
+        // Hide operations throughput table for non-HR/non-executives (show only personal)
+        const globalTodoTable = document.getElementById('dashGlobalTodoTable');
+        if (globalTodoTable && !isExecutive && !isHR) {
+            // Don't load global todos for regular employees
+            globalTodoTable.parentElement.parentElement.parentElement.style.display = 'none';
+        }
+
+        async function initDashboard() {
+            try {
+                const res = await fetch('/api/stats', { headers: { Authorization: `Bearer ${token}` } });
+                const d = await res.json();
+                if (d.error === 'Not authorized' || d.error === 'Token failed') {
+                    localStorage.clear();
+                    window.location.href = '/';
+                    return;
+                }
+
+
+                document.getElementById('kpi-total-emp').innerText = d.summary?.totalEmployees || 0;
+                document.getElementById('kpi-present').innerText = d.summary?.presentToday || 0;
+                document.getElementById('kpi-raised').innerText = d.summary?.totalTickets || 0;
+                document.getElementById('kpi-pending').innerText = d.summary?.pendingTickets || 0;
+                document.getElementById('kpi-finished').innerText = d.summary?.completedTickets || 0;
+
+                let attendancePct = 0;
+                if(d.summary?.totalEmployees > 0) attendancePct = Math.round((d.summary.presentToday / d.summary.totalEmployees) * 100);
+                document.getElementById('kpi-attendance-pct').innerText = attendancePct + '%';
+
+                initCharts(d);
+
+            } catch(e) { console.error(e); }
+        }
+
+function initCharts(data) {
+    Chart.defaults.font.family = "'Inter', sans-serif";
+    Chart.defaults.color = '#64748b';
+    Chart.defaults.scale.grid.color = 'rgba(0,0,0,0.04)';
+
+    // 1. Line Chart: Ticket Status Distribution
+    const lineCtx = document.getElementById('ticketLineChart').getContext('2d');
+    const g1 = lineCtx.createLinearGradient(0, 0, 0, 400); g1.addColorStop(0, '#3b82f6'); g1.addColorStop(1, '#2563eb');
+    new Chart(lineCtx, {
+        type: 'line',
+        data: {
+            labels: ['Raised', 'Assigned', 'Working', 'Completed'],
+            datasets: [{
+                label: 'Tickets',
+                data: [
+                    data.summary?.ticketsByStatus?.Raised || 0,
+                    data.summary?.ticketsByStatus?.Assigned || 0,
+                    data.summary?.ticketsByStatus?.Working || 0,
+                    data.summary?.ticketsByStatus?.Completed || 0
+                ],
+                backgroundColor: g1,
+                borderColor: g1,
+                fill: false,
+                tension: 0.3,
+                pointRadius: 5
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: true, position: 'right', labels: { font: { family: 'Inter', size: 11 }, boxWidth: 12 } },
+                tooltip: { backgroundColor: '#1e293b', titleFont: { size: 13, family: 'Outfit' }, bodyFont: { size: 12 }, padding: 10, cornerRadius: 8 }
+            },
+            scales: {
+                y: { beginAtZero: true, ticks: { precision: 0, font: { family: 'Inter' } } },
+                x: { ticks: { font: { family: 'Inter', weight: '600' } } }
+            }
+        }
+    });
+
+    // 2. Donut Chart: Ticket Priorities
+    const pieCtx = document.getElementById('priorityPieChart').getContext('2d');
+    const p1 = pieCtx.createLinearGradient(0, 0, 0, 400); p1.addColorStop(0, '#1e3a8a'); p1.addColorStop(1, '#172554'); // Dark Blue
+    const p2 = pieCtx.createLinearGradient(0, 0, 0, 400); p2.addColorStop(0, '#3b82f6'); p2.addColorStop(1, '#2563eb'); // Light Blue
+    const p3 = pieCtx.createLinearGradient(0, 0, 0, 400); p3.addColorStop(0, '#94a3b8'); p3.addColorStop(1, '#64748b'); // Grey
+    new Chart(pieCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['High', 'Medium', 'Low'],
+            datasets: [{
+                label: 'Tickets',
+                data: [
+                    data.summary?.ticketsByPriority?.High || 0,
+                    data.summary?.ticketsByPriority?.Medium || 0,
+                    data.summary?.ticketsByPriority?.Low || 0
+                ],
+                backgroundColor: [p1, p2, p3],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: true, position: 'right', labels: { font: { family: 'Inter', size: 11 }, boxWidth: 12 } },
+                tooltip: { backgroundColor: '#1e293b', titleFont: { size: 13, family: 'Outfit' }, bodyFont: { size: 12 }, padding: 10, cornerRadius: 8 }
+            }
+        }
+    });
+
+    // 3. Waterfall (Bar) Chart: My Raised Tickets Status
+    const execRoles2 = ['IT Admin', 'CEO', 'Chairman'];
+    if (execRoles2.includes(user.role)) {
+        fetch('/api/tickets/analytics/personal', { headers: { Authorization: `Bearer ${token}` } })
+            .then(r => r.json())
+            .then(pData => {
+                const myCtx = document.getElementById('myRaisedChart').getContext('2d');
+                new Chart(myCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Total Raised', 'Working', 'Assigned', 'Completed', 'Rejected', 'Overdue'],
+                        datasets: [
+                            { label: 'Total Raised', data: [pData.raised?.total || 0, 0, 0, 0, 0, 0], backgroundColor: '#1e3a8a' },
+                            { label: 'Working', data: [0, pData.raised?.Working || 0, 0, 0, 0, 0], backgroundColor: '#10b981' },
+                            { label: 'Assigned', data: [0, 0, pData.raised?.Assigned || 0, 0, 0, 0], backgroundColor: '#f59e0b' },
+                            { label: 'Completed', data: [0, 0, 0, pData.raised?.Completed || 0, 0, 0], backgroundColor: '#2563eb' },
+                            { label: 'Rejected', data: [0, 0, 0, 0, pData.raised?.Rejected || 0, 0], backgroundColor: '#dc2626' },
+                            { label: 'Overdue', data: [0, 0, 0, 0, 0, pData.raised?.Overdue || 0], backgroundColor: '#d97706' }
+                        ]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: true, position: 'right', labels: { font: { family: 'Inter', size: 11 }, boxWidth: 12 } },
+                            tooltip: { backgroundColor: '#1e293b', titleFont: { size: 13, family: 'Outfit' }, bodyFont: { size: 12 }, padding: 10, cornerRadius: 8 }
+                        },
+                        scales: {
+                            x: { stacked: true, ticks: { font: { family: 'Inter', weight: '600' } } },
+                            y: { stacked: true, beginAtZero: true, ticks: { precision: 0, font: { family: 'Inter' } } }
+                        }
+                    }
+                });
+            })
+            .catch(e => console.error('Personal chart error', e));
+    }
+}
+
+async function loadLists() {
+    try {
+        // Fetch Reminders for Today's Operations
+        const remRes = await fetch('/api/reminders/my', { headers: { Authorization: `Bearer ${token}` } });
+        if (remRes.ok) {
+            const rems = await remRes.json();
+            const today = new Date().toDateString();
+            const todayRems = Array.isArray(rems) ? rems.filter(r => new Date(r.reminderDateTime).toDateString() === today) : [];
+            const opsRemEl = document.getElementById('opsReminders');
+            if (opsRemEl) {
+                opsRemEl.innerHTML = todayRems.length ? todayRems.map(r => `<div style="margin-bottom:4px;">&bull; ${r.message} (${new Date(r.reminderDateTime).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})})</div>`).join('') : '<div style="font-size:11px;color:var(--text-light);">No reminders today</div>';
+            }
+        }
+    } catch(e) { console.error('Failed to load operations reminders:', e); }
+
+    try {
+        // Today's Operations: Active Tickets
+        const tRes = await fetch('/api/tickets/my-tickets', { headers: { Authorization: `Bearer ${token}` } });
+        if (tRes.ok) {
+            const tData = await tRes.json();
+            const active = Array.isArray(tData) ? tData.filter(t => t.status !== 'Completed' && t.status !== 'Rejected').slice(0, 3) : [];
+            const opsTickEl = document.getElementById('opsTickets');
+            if (opsTickEl) {
+                opsTickEl.innerHTML = active.length ? active.map(t => `<div style="margin-bottom:4px;">&bull; [${t.ticketId}] ${t.title}</div>`).join('') : '<div style="font-size:11px;color:var(--text-light);">No active tickets</div>';
+            }
+        }
+    } catch(e) { console.error('Failed to load tickets:', e); }
+
+    try {
+        // Today's Operations: Messages
+        const mRes = await fetch('/api/chat/recent', { headers: { Authorization: `Bearer ${token}` } });
+        if (mRes.ok) {
+            const mData = await mRes.json();
+            const msgs = Array.isArray(mData) ? mData.slice(0, 2) : [];
+            const opsChatEl = document.getElementById('opsChat');
+            if (opsChatEl) {
+                opsChatEl.innerHTML = msgs.length ? msgs.map(m => `<div style="margin-bottom:4px;">&bull; <b>${m.Sender?.fullName || m.senderId}:</b> ${m.content || 'Sent a file'}</div>`).join('') : '<div style="font-size:11px;color:var(--text-light);">No new messages</div>';
+            }
+        }
+    } catch(e) { console.error('Failed to load chat:', e); }
+
+    dashLoadMyTodos();
+    loadDashReminders();
+}
+
+async function dashAddTodo() {
+    const val = document.getElementById('dashTdTitle').value;
+    const monthVal = document.getElementById('dashTdMonth')?.value || '';
+    if(!val) return;
+    try {
+        await fetch('/api/todos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ title: val, reminderMonth: monthVal || null })
+        });
+        document.getElementById('dashTdTitle').value = '';
+        if(document.getElementById('dashTdMonth')) document.getElementById('dashTdMonth').value = '';
+        dashLoadMyTodos();
+        dashLoadGlobalTodos();
+    } catch(e) { console.error(e); }
+}
+
+async function doneTodo(id) {
+    try {
+        await fetch(`/api/todos/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ isDone: true })
+        });
+        dashLoadMyTodos();
+        dashLoadGlobalTodos();
+    } catch(e) { console.error(e); }
+}
+
+async function delTodo(id) {
+    if(!confirm("Delete this To-Do?")) return;
+    try {
+        await fetch(`/api/todos/${id}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        dashLoadMyTodos();
+        dashLoadGlobalTodos();
+    } catch(e) { console.error(e); }
+}
+
+async function dashAddReminder() {
+    const val = document.getElementById('dashRemMsg').value.trim();
+    const dateVal = document.getElementById('dashRemDate')?.value;
+    
+    if(!val) {
+        alert('Please enter a reminder title');
+        return;
+    }
+    try {
+        let reminderDT;
+        if (dateVal) {
+            reminderDT = new Date(dateVal);
+        } else {
+            reminderDT = new Date();
+            reminderDT.setHours(reminderDT.getHours() + 1);
+        }
+        
+        await fetch('/api/reminders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ message: val, reminderDateTime: reminderDT.toISOString(), isPublic: false })
+        });
+        document.getElementById('dashRemMsg').value = '';
+        if(document.getElementById('dashRemDate')) document.getElementById('dashRemDate').value = '';
+        loadLists();
+        loadDashReminders();
+    } catch(e) { console.error(e); }
+}
+
+async function doneRem(id) {
+    try {
+        await fetch(`/api/reminders/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ isDismissed: true })
+        });
+        loadLists();
+        loadDashReminders();
+    } catch(e) { console.error(e); }
+}
+
+async function delRem(id) {
+    if(!confirm("Delete this Reminder?")) return;
+    try {
+        await fetch(`/api/reminders/${id}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        loadLists();
+        loadDashReminders();
+    } catch(e) { console.error(e); }
+}
+
+initDashboard();
+loadLists();
+    
+// ── DASHBOARD TODO WIDGET ──
+async function dashLoadMyTodos() {
+    const list = document.getElementById('dashMyTodoList');
+    if (!list) return;
+    try {
+        const res = await fetch('/api/todos', { headers: { Authorization: `Bearer ${token}` } });
+        const todos = await res.json();
+        list.innerHTML = '';
+        const active = Array.isArray(todos) ? todos.filter(t => !t.isDeleted) : [];
+        if (!active.length) {
+            list.innerHTML = '<div style="color:var(--text-light);text-align:center;padding:20px;font-size:13px;">No tasks yet. Add one above!</div>';
+            return;
+        }
+        active.forEach(t => {
+            const item = document.createElement('div');
+            item.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f8fafc;border:1px solid var(--border);border-radius:4px;';
+            item.innerHTML = `
+                <div>
+                    <div style="font-weight:600;font-size:13px;color:var(--text-main);">${t.title}</div>
+                    ${t.reminderMonth ? `<div style="font-size:11px;color:#4f46e5;margin-top:2px;"><i class="fa-solid fa-calendar-days"></i> ${t.reminderMonth}</div>` : ''}
+                </div>
+                <button onclick="dashDoneTodo(${t.id})" style="background:#16a34a;color:white;border:none;border-radius:4px;padding:5px 12px;cursor:pointer;font-size:12px;font-weight:700;display:flex;align-items:center;gap:5px;flex-shrink:0;">
+                    <i class="fa-solid fa-check"></i> Done
+                </button>`;
+            list.appendChild(item);
+        });
+    } catch(e) { console.error('dashLoadMyTodos error:', e); }
+}
+
+async function dashAddTodo() {
+    const titleEl = document.getElementById('dashTdTitle');
+    const monthEl = document.getElementById('dashTdMonth');
+    const title = titleEl ? titleEl.value.trim() : '';
+    const month = monthEl ? monthEl.value : '';
+    if (!title) { alert('Please enter a task description'); return; }
+    try {
+        await fetch('/api/todos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ title, reminderMonth: month || null })
+        });
+        if (titleEl) titleEl.value = '';
+        if (monthEl) monthEl.value = '';
+        await dashLoadMyTodos();
+        await dashLoadGlobalTodos();
+    } catch(e) { console.error('dashAddTodo error:', e); }
+}
+
+async function dashDoneTodo(id) {
+    try {
+        await fetch(`/api/todos/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ isDone: true })
+        });
+        await dashLoadMyTodos();
+        await dashLoadGlobalTodos();
+    } catch(e) { console.error('dashDoneTodo error:', e); }
+}
+
+async function dashLoadGlobalTodos() {
+    const tbody = document.getElementById('dashGlobalTodoTable');
+    if (!tbody) return;
+    try {
+        const res = await fetch('/api/todos/all', { headers: { Authorization: `Bearer ${token}` } });
+        const todos = await res.json();
+        tbody.innerHTML = '';
+        if (!Array.isArray(todos) || !todos.length) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--text-light);font-size:13px;">No tasks in pipeline yet</td></tr>';
+            return;
+        }
+        todos.forEach(t => {
+            const name = t.User ? t.User.fullName : 'Unknown';
+            const role = t.User ? t.User.role : '';
+            const done = t.isDeleted;
+            const tr = document.createElement('tr');
+            tr.style.borderBottom = '1px solid var(--border)';
+            tr.innerHTML = `
+                <td style="padding:10px 12px;">
+                    <div style="font-weight:600;font-size:13px;">${name}</div>
+                    <div style="font-size:10px;color:var(--text-light);">${role}</div>
+                </td>
+                <td style="padding:10px 12px;font-size:13px;${done ? 'text-decoration:line-through;color:var(--text-light);' : ''}">${t.title}</td>
+                <td style="padding:10px 12px;">
+                    <span style="padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;background:#eef2ff;color:#4f46e5;">${t.reminderMonth || '—'}</span>
+                </td>
+                <td style="padding:10px 12px;">
+                    ${done
+                        ? '<span style="color:#16a34a;font-weight:700;font-size:12px;"><i class="fa-solid fa-check-circle"></i> Done</span>'
+                        : '<span style="color:#d97706;font-weight:700;font-size:12px;"><i class="fa-solid fa-clock"></i> Pending</span>'
+                    }
+                </td>`;
+            tbody.appendChild(tr);
+        });
+    } catch(e) { console.error('dashLoadGlobalTodos error:', e); }
+}
+
+dashLoadMyTodos();
+dashLoadGlobalTodos();
+loadDashReminders();
+
+async function loadDashReminders(){
+    try {
+        const res = await fetch('/api/reminders/my', { headers: { Authorization: "Bearer " + token } });
+        const list = document.getElementById('dashRemindersList');
+        if(!list) return;
+        if (!res.ok) {
+            list.innerHTML = '<div style="color:var(--text-light);text-align:center;padding:15px;font-size:12px;">No upcoming reminders.</div>';
+            return;
+        }
+        const data = await res.json();
+        list.innerHTML = '';
+        if(!data || !Array.isArray(data) || data.length === 0) {
+            list.innerHTML = '<div style="color:var(--text-light);text-align:center;padding:15px;font-size:12px;">No upcoming reminders. Add one above!</div>';
+            return;
+        }
+        
+        const todayStr = new Date().toISOString().slice(0, 10);
+        
+        data.forEach(r => {
+            const isToday = r.reminderDateTime && r.reminderDateTime.slice(0, 10) === todayStr;
+            const rDate = r.reminderDateTime ? new Date(r.reminderDateTime).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'No date';
+            
+            const div = document.createElement('div');
+            div.style.cssText = "display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border:1px solid var(--border-soft);border-radius:6px;background:" + (isToday ? '#f0fdf4' : '#fff') + ";border-left: 4px solid " + (isToday ? '#16a34a' : '#94a3b8') + ";";
+            div.innerHTML = "<div style='flex:1;overflow:hidden;padding-right:6px;'>" +
+                    "<div style='font-weight:600;color:var(--text-main);font-size:12px;display:flex;align-items:center;gap:6px;word-break:break-word;'>" +
+                        r.message + (isToday ? " <span style='background:#dcfce7;color:#166534;padding:1px 5px;border-radius:4px;font-size:9px;font-weight:700;'>TODAY</span>" : "") +
+                    "</div>" +
+                    "<div style='font-size:10.5px;color:var(--text-light);margin-top:2px;'>" +
+                        "<i class='fa-regular fa-clock'></i> " + rDate +
+                    "</div>" +
+                "</div>" +
+                "<div style='display:flex;gap:6px;align-items:center;flex-shrink:0;'>" +
+                    "<i class='fa-solid fa-check' style='color:#16a34a;cursor:pointer;font-size:13px;padding:3px;' onclick='doneRem(" + r.id + ")' title='Mark as Done'></i>" +
+                    "<i class='fa-solid fa-trash' style='color:#ef4444;cursor:pointer;font-size:12px;padding:3px;' onclick='delRem(" + r.id + ")' title='Delete'></i>" +
+                "</div>";
+            list.appendChild(div);
+        });
+    } catch(e) { console.error('Error loading reminders:', e); }
+}
+
+</script>
+<script src="/js/nav-sync.js"></script>
+<script src="/js/sidebar.js"></script>
+<script>
+window.showSection = function(name) {
+    const ids = ['mainSection', 'todoSection', 'leavesSection', 'holidaysSection'];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+    });
+    const active = document.getElementById(name + 'Section');
+    if (active) active.style.display = 'flex';
+};
+</script>
+<script src="/js/hr_leaves.js"></script>
+<script src="/js/hr_holidays.js"></script>
+<!-- Backup Modal -->
+    <div id="backupModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
+        <div style="background:white; padding:24px; border-radius:12px; width:350px; box-shadow:0 10px 25px rgba(0,0,0,0.1);">
+            <h3 style="margin-top:0; font-family:'Outfit', sans-serif; font-size:18px; color:var(--primary-dark);">Generate Backup</h3>
+            <p style="font-size:13px; color:var(--text-light); margin-bottom:16px;">Export employee data and documents securely.</p>
+            
+            
+            
+            <label style="font-size:12px; font-weight:600; color:var(--text-main); margin-bottom:4px; display:block;">Target Email</label>
+            <input type="email" id="backupEmail" placeholder="your-email@outlook.com" style="width:100%; padding:8px 12px; border:1px solid var(--border-soft); border-radius:6px; margin-bottom:20px; box-sizing:border-box;">
+            
+            <div id="backupMessage" style="font-size:12px; margin-bottom:12px; display:none;"></div>
+
+            <div style="display:flex; justify-content:flex-end; gap:10px;">
+                <button onclick="document.getElementById('backupModal').style.display='none'" style="padding:8px 16px; border:1px solid var(--border-soft); background:white; color:var(--text-main); border-radius:6px; cursor:pointer; font-weight:500;">Cancel</button>
+                <button id="backupSubmitBtn" onclick="processBackup()" style="padding:8px 16px; border:none; background:var(--primary); color:white; border-radius:6px; cursor:pointer; font-weight:500;">Send Backup</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

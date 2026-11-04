@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Secure Login | EXO GLOBAL</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="exologo.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="EXO ERP">
+    <meta name="theme-color" content="#0a192f">
+    <link rel="stylesheet" href="css/responsive-universal.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+*, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+        body { font-family:'Inter',sans-serif; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); min-height:100vh; display:flex; align-items:center; justify-content:center; overflow-x:hidden; position:relative; }
+        .bg-orb { position:fixed; border-radius:50%; filter:blur(100px); opacity:0.4; animation:orbFloat 10s ease-in-out infinite; pointer-events:none; }
+        .bg-orb-1 { width:700px; height:700px; background: radial-gradient(circle, #00d4ff, transparent 70%); top:-250px; left:-150px; }
+        .bg-orb-2 { width:600px; height:600px; background: radial-gradient(circle, #7c3aed, transparent 70%); bottom:-200px; right:-150px; animation-delay:-5s; }
+        .bg-orb-3 { position:fixed; width:400px; height:400px; background: radial-gradient(circle, #f59e0b, transparent 70%); top:50%; left:50%; transform:translate(-50%,-50%); border-radius:50%; filter:blur(80px); opacity:0.15; }
+        @keyframes orbFloat { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-30px) scale(1.05)} }
+        
+        .login-card { position:relative; z-index:10; width:100%; max-width:420px; margin:20px; background:rgba(255,255,255,0.04); backdrop-filter:blur(24px); border:1px solid rgba(255,255,255,0.1); border-radius:24px; padding:40px; box-shadow:0 32px 80px rgba(0,0,0,0.5); }
+        .logo-wrap { display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:32px; }
+        .logo-icon { width: 30px; height: 30px; background: #374151; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; }
+        .logo-text h1 { font-size:20px; font-weight:800; color:white; }
+        
+        .form-group { margin-bottom:18px; }
+        .form-label { display:block; font-size:12px; font-weight:600; color:rgba(255,255,255,0.6); margin-bottom:8px; }
+        .input-wrap { position:relative; }
+        .input-wrap i { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:rgba(255,255,255,0.3); }
+        .input-wrap input { width:100%; padding:13px 45px 13px 40px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius: 4px; color:white; outline:none; transition: 0.3s; }
+        .input-wrap input:focus { border-color: #3b82f6; background: rgba(255,255,255,0.1); }
+        
+        .login-btn { width:100%; padding:14px; background:linear-gradient(135deg,#3b82f6,#6366f1); color:white; border:none; border-radius: 4px; font-weight:700; cursor:pointer; transition: 0.3s; }
+        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3); }
+        .error-msg { background:rgba(239,68,68,1); color:white; border-radius: 4px; padding:12px; font-size:13px; margin-top:16px; display:none; align-items:center; gap:8px; }
+    
+        @media (max-width: 1024px) {
+            .content { grid-template-columns: 1fr !important; gap: 20px; padding: 20px; }
+            .dashboard-grid { grid-template-columns: 1fr !important; }
+            .metrics-grid { grid-template-columns: repeat(2, 1fr) !important; }
+            header, .topbar { padding: 0 20px !important; }
+        }
+        @media (max-width: 768px) {
+            body { flex-direction: column !important; }
+            #sidebar { width: 100% !important; height: auto !important; flex-direction: row !important; flex-wrap: wrap; justify-content: space-between; align-items: center; padding: 10px; z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.1); }
+            .logo { height: 40px !important; padding: 0 10px !important; border: none !important; font-size: 18px; width: 100%; justify-content: center; border-bottom: 1px solid rgba(255,255,255,0.05) !important; margin-bottom: 5px; }
+            .nav-list, nav { flex-direction: row !important; padding: 0 !important; width: 100% !important; overflow-x: auto !important; gap: 5px !important; align-items: center; }
+            .nav-item { padding: 8px 12px !important; font-size: 13px !important; white-space: nowrap !important; border-radius: 4px !important; }
+            .metrics-grid { grid-template-columns: 1fr !important; }
+            header, .topbar { height: auto !important; flex-direction: column !important; padding: 15px !important; align-items: stretch !important; gap: 15px !important; }
+            .search { width: 100% !important; }
+            .top-right { width: 100% !important; justify-content: space-between !important; }
+            .dashboard { padding: 15px !important; }
+            .modal { width: 95% !important; padding: 20px !important; border-radius: 12px !important; max-height: 80vh !important; }
+            .chat-container { flex-direction: column !important; }
+            .chat-sidebar { width: 100% !important; height: 250px !important; border-right: none !important; border-bottom: 1px solid var(--border) !important; flex-shrink: 0; }
+            .ticket-header { flex-direction: column !important; gap: 10px !important; align-items: flex-start !important; }
+            .action-bar { flex-direction: column !important; align-items: flex-start !important; gap: 15px !important; }
+            .detail-pane { border-radius: 12px !important; }
+            .btn { width: 100% !important; justify-content: center !important; }
+        }
+    </style>
+</head>
+<body>
+<div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <div class="bg-orb bg-orb-3"></div>
+
+    <div class="login-card">
+<div class="logo-wrap">
+<div class="logo-wrap">
+    <img src="exologo.png?v=2" alt="EXO" style="width: 96px; height: 96px; object-fit: contain;" />
+</div>
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label class="form-label">Employee ID</label>
+                <div class="input-wrap">
+                    <i class="fa-solid fa-id-card"></i>
+                    <input type="text" id="employeeId" required placeholder="User ID" style="text-transform: uppercase;">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <div class="input-wrap">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="password" required placeholder="••••••••">
+                    <button type="button" onclick="togglePass()" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; color:rgba(255,255,255,0.3); cursor:pointer;">
+                        <i class="fa-solid fa-eye" id="eyeIcon"></i>
+                    </button>
+                </div>
+            </div>
+            <button type="submit" class="login-btn" id="loginBtn">Sign In</button>
+            <div style="text-align:center; margin-top:15px;">
+                <a href="#" onclick="showReset()" style="font-size:12px; color:rgba(255,255,255,0.4); text-decoration:none;">Forgot Password?</a>
+            </div>
+            <div class="error-msg" id="errorMsg"><i class="fa-solid fa-circle-exclamation"></i><span id="errorText"></span></div>
+        </form>
+
+        <div id="resetArea" style="display:none; margin-top:10px;">
+            <div style="text-align:center; margin-bottom:20px;">
+                <h3 style="color:white; margin-bottom:5px;">Password Recovery</h3>
+                <p style="font-size:12px; color:rgba(255,255,255,0.4);">Enter your ID to receive WhatsApp OTP</p>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Employee ID</label>
+                <input type="text" id="resetId" placeholder="EXO-101" style="width:100%; border-radius: 4px; padding:12px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:white; outline:none; text-transform: uppercase;">
+            </div>
+            <button class="login-btn" onclick="requestOTP()" id="otpBtn">Send OTP</button>
+
+            <div id="otpVerifyArea" style="display:none; margin-top:20px;">
+                <div class="form-group">
+                    <label class="form-label">WhatsApp OTP</label>
+                    <input type="text" id="resetOtp" placeholder="123456" style="width:100%; border-radius: 4px; padding:12px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:white; outline:none; text-align:center;">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">New Password</label>
+                    <input type="password" id="newPass" placeholder="••••••••" style="width:100%; border-radius: 4px; padding:12px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:white; outline:none;">
+                </div>
+                <button class="login-btn" onclick="verifyOTP()" id="verifyBtn">Update Password</button>
+            </div>
+            <div style="text-align:center; margin-top:15px;">
+                <a href="#" onclick="location.reload()" style="font-size:12px; color:rgba(255,255,255,0.4); text-decoration:none;">Back to Login</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function togglePass() {
+            const p = document.getElementById('password');
+            const eye = document.getElementById('eyeIcon');
+            if (p.type === 'password') {
+                p.type = 'text';
+                eye.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                p.type = 'password';
+                eye.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        // Role Dashboard routing
+        function getDashboardByRole(role) {
+            return 'dashboard.html';
+        }
+
+        const loginForm = document.getElementById('loginForm');
+        
+        loginForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('loginBtn');
+            const err = document.getElementById('errorMsg');
+            const employeeId = document.getElementById('employeeId').value.trim().toUpperCase();
+            const password   = document.getElementById('password').value;
+
+            btn.disabled = true; 
+            btn.style.opacity = '0.7';
+            btn.innerText = 'Authenticating...';
+            err.style.display = 'none';
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ employeeId, password })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    btn.innerText = 'Success! Entering...';
+                    btn.style.background = '#22c55e';
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    setTimeout(() => window.location.href = getDashboardByRole(data.user.role), 800);
+                } else {
+                    document.getElementById('errorText').innerText = data.error || 'Login failed';
+                    err.style.display = 'flex';
+                    btn.disabled = false; btn.innerText = 'Sign In'; btn.style.opacity = '1';
+                }
+            } catch (k) {
+                document.getElementById('errorText').innerText = 'Connection error';
+                err.style.display = 'flex';
+                btn.disabled = false; btn.innerText = 'Sign In'; btn.style.opacity = '1';
+            }
+        };
+
+        function showReset() {
+            document.getElementById('resetArea').style.display = 'block';
+            loginForm.style.display = 'none';
+        }
+
+        async function requestOTP() {
+            const id = document.getElementById('resetId').value.trim().toUpperCase();
+            const btn = document.getElementById('otpBtn');
+            if (!id) return alert('Enter Employee ID');
+            
+            btn.innerHTML = 'Sending...'; btn.disabled = true;
+            try {
+                const res = await fetch('/api/auth/password-reset/request', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ employeeId: id })
+                });
+                const d = await res.json();
+                if (res.ok) {
+                    document.getElementById('otpVerifyArea').style.display = 'block';
+                    btn.style.display = 'none';
+                    if (d.simulated) {
+                        alert('🛠️ TESTING MODE: OTP is ' + d.code + ' (Check terminal too)');
+                        document.getElementById('resetOtp').value = d.code; // Auto-fill for convenience
+                    } else {
+                        alert('✅ ' + d.message);
+                    }
+                } else {
+                    alert('❌ ' + (d.error || 'Failed to send OTP. Ensure your Employee ID is correct and you have a WhatsApp number saved in your profile.'));
+                }
+            } catch (e) { alert('Network error'); }
+            finally { btn.innerHTML = 'Send OTP'; btn.disabled = false; }
+        }
+
+        async function verifyOTP() {
+            const id = document.getElementById('resetId').value.trim().toUpperCase();
+            const otp = document.getElementById('resetOtp').value.trim();
+            const newPassword = document.getElementById('newPass').value;
+            const btn = document.getElementById('verifyBtn');
+
+            if (!otp || !newPassword) return alert('Missing fields');
+            
+            btn.innerHTML = 'Verifying...'; btn.disabled = true;
+            try {
+                // Step 1: Verify OTP
+                const res = await fetch('/api/auth/password-reset/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ employeeId: id, otp })
+                });
+                const d = await res.json();
+                if (res.ok) {
+                    const resetToken = d.resetToken;
+                    // Step 2: Complete Reset
+                    btn.innerHTML = 'Updating Password...';
+                    const res2 = await fetch('/api/auth/password-reset/complete', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${resetToken}`
+                        },
+                        body: JSON.stringify({ newPassword })
+                    });
+                    const d2 = await res2.json();
+                    if (res2.ok) {
+                        alert('✅ ' + d2.message);
+                        location.reload();
+                    } else {
+                        alert('❌ ' + d2.error);
+                    }
+                } else {
+                    alert('❌ ' + (d.error || 'Invalid OTP'));
+                }
+            } catch (e) { alert('Network error'); }
+            finally { btn.innerHTML = 'Update Password'; btn.disabled = false; }
+        }
+
+        async function checkToken() {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+            try {
+                const res = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${token}` } });
+                if (res.ok) {
+                    const u = JSON.parse(localStorage.getItem('user') || '{}');
+                    window.location.href = getDashboardByRole(u.role);
+                } else {
+                    localStorage.clear();
+                }
+            } catch (e) { localStorage.clear(); }
+        }
+        checkToken();
+    </script>
+    <script src="js/pwa-install.js" defer></script>
+</body>
+</html>

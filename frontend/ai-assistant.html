@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assistant & Copilot | EXO GLOBAL</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        :root {
+            --ai-bg: #0f172a;
+            --ai-surface: #1e293b;
+            --ai-surface-light: #334155;
+            --ai-accent: #38bdf8;
+            --ai-accent-hover: #0ea5e9;
+            --ai-glow: rgba(56, 189, 248, 0.25);
+            --ai-bubble-bot: #1e293b;
+            --ai-bubble-user: #2563eb;
+            --ai-text: #f8fafc;
+            --ai-text-muted: #94a3b8;
+            --ai-border: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .ai-layout {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        .ai-main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f8fafc;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Topbar Header */
+        .ai-topbar {
+            height: 70px;
+            padding: 0 32px;
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            flex-shrink: 0;
+            z-index: 20;
+        }
+
+        .ai-header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .ai-badge-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #0284c7, #2563eb);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            box-shadow: 0 4px 14px rgba(37,99,235,0.3);
+            animation: pulseGlow 3s infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 4px 14px rgba(37,99,235,0.3); }
+            50% { box-shadow: 0 4px 22px rgba(56,189,248,0.55); }
+        }
+
+        .ai-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ai-pill {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 99px;
+            background: rgba(37,99,235,0.1);
+            color: #2563eb;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ai-topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .ai-btn-ghost {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ai-btn-ghost:hover {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+
+        /* Chat Content Canvas */
+        .ai-chat-canvas {
+            flex: 1;
+            overflow-y: auto;
+            padding: 32px 15% 20px 15%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            scroll-behavior: smooth;
+        }
+
+        @media (max-width: 1200px) {
+            .ai-chat-canvas {
+                padding: 24px 6% 20px 6%;
+            }
+        }
+
+        /* Welcome Hero banner */
+        .ai-welcome-card {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 36px 40px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(15,23,42,0.12);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .ai-welcome-card::after {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(56,189,248,0.2), transparent 70%);
+            pointer-events: none;
+        }
+
+        .ai-hero-icon {
+            width: 68px;
+            height: 68px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #38bdf8, #2563eb);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            margin-bottom: 18px;
+            box-shadow: 0 8px 24px rgba(37,99,235,0.4);
+        }
+
+        .ai-hero-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .ai-hero-subtitle {
+            font-size: 14px;
+            color: #94a3b8;
+            max-width: 600px;
+            margin: 0 auto 24px auto;
+            line-height: 1.6;
+        }
+
+        /* Chips Grid */
+        .ai-chips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            text-align: left;
+        }
+
+        .ai-chip {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .ai-chip:hover {
+            background: rgba(56,189,248,0.15);
+            border-color: rgba(56,189,248,0.4);
+            transform: translateY(-2px);
+        }
+
+        .ai-chip-icon {
+            font-size: 16px;
+            color: #38bdf8;
+            margin-top: 2px;
+        }
+
+        .ai-chip-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 2px;
+        }
+
+        .ai-chip-desc {
+            font-size: 11px;
+            color: #94a3b8;
+            line-height: 1.4;
+        }
+
+        /* Message Bubbles */
+        .ai-msg-row {
+            display: flex;
+            gap: 16px;
+            width: 100%;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .ai-msg-row.user {
+            justify-content: flex-end;
+        }
+
+        .ai-msg-row.bot {
+            justify-content: flex-start;
+        }
+
+        .ai-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .ai-msg-row.user .ai-avatar {
+            background: #2563eb;
+            color: white;
+            order: 2;
+        }
+
+        .ai-msg-row.bot .ai-avatar {
+            background: linear-gradient(135deg, #0284c7, #0ea5e9);
+            color: white;
+        }
+
+        .ai-bubble-box {
+            max-width: 82%;
+            border-radius: 16px;
+            padding: 18px 22px;
+            font-size: 14.5px;
+            line-height: 1.65;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        .ai-msg-row.user .ai-bubble-box {
+            background: #2563eb;
+            color: #ffffff;
+            border-top-right-radius: 4px;
+        }
+
+        .ai-msg-row.bot .ai-bubble-box {
+            background: #ffffff;
+            color: #1e293b;
+            border: 1px solid #e2e8f0;
+            border-top-left-radius: 4px;
+        }
+
+        .ai-bubble-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+        }
+
+        .ai-msg-row.user .ai-bubble-header {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .ai-bubble-content {
+            word-wrap: break-word;
+        }
+
+        .ai-bubble-content h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            margin: 4px 0 10px 0;
+            color: #0f172a;
+        }
+
+        .ai-bubble-content p {
+            margin: 0 0 10px 0;
+        }
+
+        .ai-bubble-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .ai-bubble-content ul, .ai-bubble-content ol {
+            margin: 6px 0 12px 20px;
+            padding: 0;
+        }
+
+        .ai-bubble-content li {
+            margin-bottom: 4px;
+        }
+
+        .ai-bubble-content blockquote {
+            border-left: 3px solid #38bdf8;
+            background: #f0f9ff;
+            padding: 8px 14px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+            color: #0369a1;
+        }
+
+        .ai-bubble-content code {
+            font-family: 'Fira Code', monospace;
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #0284c7;
+        }
+
+        .ai-bubble-content pre {
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 14px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            margin: 10px 0;
+        }
+
+        .ai-bubble-content pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+
+        .ai-bubble-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .ai-copy-btn {
+            background: transparent;
+            border: 1px solid #cbd5e1;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+
+        .ai-copy-btn:hover {
+            background: #f8fafc;
+            color: #0f172a;
+            border-color: #94a3b8;
+        }
+
+        /* Typing indicator */
+        .ai-typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 14px 20px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            width: fit-content;
+        }
+
+        .ai-typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #38bdf8;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .ai-typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .ai-typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1.0); }
+        }
+
+        /* Input Bar */
+        .ai-input-dock {
+            padding: 16px 15% 24px 15%;
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            flex-shrink: 0;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.02);
+            z-index: 10;
+        }
+
+        @media (max-width: 1200px) {
+            .ai-input-dock {
+                padding: 14px 6% 20px 6%;
+            }
+        }
+
+        .ai-input-box {
+            display: flex;
+            align-items: center;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 6px 10px 6px 18px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+
+        .ai-input-box:focus-within {
+            border-color: #2563eb;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(37,99,235,0.1);
+        }
+
+        .ai-input-field {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 14.5px;
+            color: #0f172a;
+            outline: none;
+            padding: 8px 0;
+            resize: none;
+            font-family: inherit;
+        }
+
+        .ai-input-field::placeholder {
+            color: #94a3b8;
+        }
+
+        .ai-send-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 16px;
+            flex-shrink: 0;
+            margin-left: 8px;
+        }
+
+        .ai-send-btn:hover {
+            background: #1d4ed8;
+            transform: scale(1.04);
+        }
+
+        .ai-send-btn:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .ai-dock-hints {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+            font-size: 11px;
+            color: #94a3b8;
+            padding: 0 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="ai-layout">
+        <!-- Unified Stable Sidebar -->
+        <aside id="sidebar"></aside>
+
+        <!-- Main AI Content Container -->
+        <main class="ai-main-container">
+            <!-- Topbar -->
+            <header class="ai-topbar">
+                <div class="ai-header-left">
+                    <div class="ai-badge-icon">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div>
+                        <div class="ai-title">
+                            EXO AI Copilot
+                            <span class="ai-pill" id="aiProviderBadge">Active</span>
+                        </div>
+                        <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">
+                            Enterprise AI Assistant & Ticket Copilot
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ai-topbar-actions">
+                    <button class="ai-btn-ghost" onclick="clearConversation()">
+                        <i class="fa-solid fa-trash-can"></i>
+                        <span>Clear Chat</span>
+                    </button>
+                    <div class="profile" onclick="window.location.href='profile.html'" style="display:flex; align-items:center; gap:10px; cursor:pointer; margin-left:12px;">
+                        <div style="text-align:right">
+                            <div id="uName" style="font-weight:700; font-size:13px; color:#0f172a;">User</div>
+                            <div id="uRole" style="font-size:11px; color:#64748b;">Role</div>
+                        </div>
+                        <div class="avatar" id="uAv" style="width:36px; height:36px; border-radius:50%; background:#2563eb; color:white; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px;">U</div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Chat Canvas -->
+            <div class="ai-chat-canvas" id="chatCanvas">
+                <!-- Welcome Card -->
+                <div class="ai-welcome-card" id="welcomeCard">
+                    <div class="ai-hero-icon">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+                    <div class="ai-hero-title">How can I assist your work today?</div>
+                    <div class="ai-hero-subtitle">
+                        Draft tickets, compose HR notices, query attendance policies, review performance summaries, or brainstorm operational strategies.
+                    </div>
+
+                    <div class="ai-chips-grid">
+                        <div class="ai-chip" onclick="applyPromptChip('Draft a priority IT ticket for high database latency during checkout')">
+                            <i class="fa-solid fa-ticket ai-chip-icon"></i>
+                            <div>
+                                <div class="ai-chip-title">Draft IT Support Ticket</div>
+                                <div class="ai-chip-desc">Generate structured ticket with reproduction steps</div>
+                            </div>
+                        </div>
+
+                        <div class="ai-chip" onclick="applyPromptChip('Explain the EXO GLOBAL leave policy and how to request paid vacation')">
+                            <i class="fa-solid fa-calendar-check ai-chip-icon"></i>
+                            <div>
+                                <div class="ai-chip-title">Explain Leave Policies</div>
+                                <div class="ai-chip-desc">Review sick leaves, annual leave quotas & approvals</div>
+                            </div>
+                        </div>
+
+                        <div class="ai-chip" onclick="applyPromptChip('Draft an official company notice regarding upcoming system maintenance this weekend')">
+                            <i class="fa-solid fa-bullhorn ai-chip-icon"></i>
+                            <div>
+                                <div class="ai-chip-title">Write Company Notice</div>
+                                <div class="ai-chip-desc">Create formal employee announcements & updates</div>
+                            </div>
+                        </div>
+
+                        <div class="ai-chip" onclick="applyPromptChip('How do I record attendance and verify my daily check-in hours?')">
+                            <i class="fa-solid fa-clock ai-chip-icon"></i>
+                            <div>
+                                <div class="ai-chip-title">Attendance Guide</div>
+                                <div class="ai-chip-desc">Time-tracking, missing punch tickets & shifts</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messages stream container -->
+                <div id="messagesContainer" style="display:flex; flex-direction:column; gap:20px;"></div>
+
+                <!-- Typing indicator (hidden by default) -->
+                <div class="ai-msg-row bot" id="typingIndicator" style="display:none;">
+                    <div class="ai-avatar">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div class="ai-typing-indicator">
+                        <div class="ai-typing-dot"></div>
+                        <div class="ai-typing-dot"></div>
+                        <div class="ai-typing-dot"></div>
+                        <span style="font-size:12px; color:#64748b; margin-left:6px; font-weight:600;">Thinking...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Dock -->
+            <div class="ai-input-dock">
+                <div class="ai-input-box">
+                    <input type="text" id="aiInput" class="ai-input-field" placeholder="Ask AI Copilot anything... (e.g. 'Draft ticket for server error', 'Summarize attendance policy')" onkeydown="handleKey(event)" />
+                    <button class="ai-send-btn" id="sendBtn" onclick="sendPrompt()">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div class="ai-dock-hints">
+                    <span>Press <b>Enter</b> to send message</span>
+                    <span>Powered by <b>EXO GLOBAL AI Engine</b></span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/sidebar.js"></script>
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/';
+
+        let user = {};
+        try {
+            user = JSON.parse(localStorage.getItem('user') || '{}');
+        } catch(e) {}
+
+        const messagesHistory = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check AI status
+            fetch('/api/ai/status', { headers: { Authorization: `Bearer ${token}` } })
+                .then(r => r.json())
+                .then(d => {
+                    const badge = document.getElementById('aiProviderBadge');
+                    if (badge && d.provider) {
+                        badge.innerText = d.provider;
+                    }
+                })
+                .catch(() => {});
+
+            document.getElementById('aiInput')?.focus();
+        });
+
+        function handleKey(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendPrompt();
+            }
+        }
+
+        function applyPromptChip(promptText) {
+            const inp = document.getElementById('aiInput');
+            if (inp) {
+                inp.value = promptText;
+                sendPrompt();
+            }
+        }
+
+        function clearConversation() {
+            if (!confirm('Clear the current conversation?')) return;
+            document.getElementById('messagesContainer').innerHTML = '';
+            messagesHistory.length = 0;
+            const welcomeCard = document.getElementById('welcomeCard');
+            if (welcomeCard) welcomeCard.style.display = 'block';
+        }
+
+        // Markdown formatter helper
+        function formatMarkdown(text) {
+            if (!text) return '';
+            let html = text
+                // Escape HTML
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                // Headers
+                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                // Blockquotes
+                .replace(/^\> (.*$)/gim, '<blockquote>$1</blockquote>')
+                // Bold & Italic
+                .replace(/\*\*(.*?)\*\*/gim, '<b>$1</b>')
+                .replace(/\*(.*?)\*/gim, '<i>$1</i>')
+                // Code blocks
+                .replace(/```([a-z]*)\n([\s\S]*?)```/gim, '<pre><code>$2</code></pre>')
+                .replace(/`([^`]+)`/gim, '<code>$1</code>')
+                // Unordered lists
+                .replace(/^\- (.*$)/gim, '<li>$1</li>')
+                .replace(/^\* (.*$)/gim, '<li>$1</li>')
+                // Ordered lists
+                .replace(/^\d+\. (.*$)/gim, '<li>$1</li>')
+                // Links
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/gim, '<a href="$2" style="color:#2563eb; font-weight:600; text-decoration:underline;">$1</a>')
+                // Newlines
+                .replace(/\n\n/gim, '<p></p>')
+                .replace(/\n/gim, '<br/>');
+
+            return html;
+        }
+
+        async function sendPrompt() {
+            const input = document.getElementById('aiInput');
+            const prompt = input.value.trim();
+            if (!prompt) return;
+
+            // Hide welcome hero on first message
+            const welcomeCard = document.getElementById('welcomeCard');
+            if (welcomeCard) welcomeCard.style.display = 'none';
+
+            // Clear input & disable send
+            input.value = '';
+            const sendBtn = document.getElementById('sendBtn');
+            sendBtn.disabled = true;
+
+            // Append User message
+            appendUserMessage(prompt);
+
+            // Show typing indicator
+            const typing = document.getElementById('typingIndicator');
+            typing.style.display = 'flex';
+            scrollCanvasToBottom();
+
+            try {
+                const res = await fetch('/api/ai/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        prompt,
+                        history: messagesHistory.slice(-6)
+                    })
+                });
+
+                const data = await res.json();
+                typing.style.display = 'none';
+
+                if (res.ok && data.response) {
+                    appendBotMessage(data.response);
+                    messagesHistory.push({ role: 'user', content: prompt });
+                    messagesHistory.push({ role: 'assistant', content: data.response });
+                } else {
+                    appendBotMessage('❌ Sorry, I encountered an issue processing your query: ' + (data.error || 'Server error'));
+                }
+            } catch (err) {
+                typing.style.display = 'none';
+                appendBotMessage('⚠️ Network connection error. Please ensure the backend server is reachable.');
+            } finally {
+                sendBtn.disabled = false;
+                input.focus();
+                scrollCanvasToBottom();
+            }
+        }
+
+        function appendUserMessage(text) {
+            const container = document.getElementById('messagesContainer');
+            const row = document.createElement('div');
+            row.className = 'ai-msg-row user';
+
+            const userInit = (user.name || user.fullName || 'U').charAt(0).toUpperCase();
+
+            row.innerHTML = `
+                <div class="ai-avatar">${userInit}</div>
+                <div class="ai-bubble-box">
+                    <div class="ai-bubble-header">${user.name || user.fullName || 'You'}</div>
+                    <div class="ai-bubble-content">${text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+                </div>
+            `;
+            container.appendChild(row);
+            scrollCanvasToBottom();
+        }
+
+        function appendBotMessage(text) {
+            const container = document.getElementById('messagesContainer');
+            const row = document.createElement('div');
+            row.className = 'ai-msg-row bot';
+
+            const formatted = formatMarkdown(text);
+            const msgId = 'msg-' + Date.now();
+
+            row.innerHTML = `
+                <div class="ai-avatar"><i class="fa-solid fa-robot"></i></div>
+                <div class="ai-bubble-box">
+                    <div class="ai-bubble-header">
+                        <span>EXO Copilot</span>
+                        <span style="font-weight:normal; opacity:0.7;">Just now</span>
+                    </div>
+                    <div class="ai-bubble-content" id="${msgId}">${formatted}</div>
+                    <div class="ai-bubble-actions">
+                        <button class="ai-copy-btn" onclick="copyMessageText('${msgId}')">
+                            <i class="fa-regular fa-copy"></i>
+                            <span>Copy</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(row);
+            scrollCanvasToBottom();
+        }
+
+        function copyMessageText(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const plainText = el.innerText || el.textContent;
+            navigator.clipboard.writeText(plainText).then(() => {
+                alert('Copied to clipboard!');
+            }).catch(() => {
+                alert('Copied!');
+            });
+        }
+
+        function scrollCanvasToBottom() {
+            const canvas = document.getElementById('chatCanvas');
+            if (canvas) {
+                setTimeout(() => {
+                    canvas.scrollTop = canvas.scrollHeight;
+                }, 50);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# Route all /api/ requests to our PHP proxy
+RewriteRule ^api/(.*)$ api.php [L,QSA]
+
+# Proxy WebSocket requests to Node.js backend
+# RewriteRule ^socket\.io/(.*)$ http://127.0.0.1:5000/socket.io/$1 [P,L]
+
+# Serve uploaded files from backend
+RewriteRule ^uploads/(.*)$ backend/uploads/$1 [L]
+</IfModule>
+
+# Increase PHP timeout for deploy scripts
+<IfModule mod_php.c>
+php_value max_execution_time 300
+</IfModule>

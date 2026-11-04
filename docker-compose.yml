@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+  # MySQL – primary relational store (no TLS for simplicity)
+  mysql:
+    image: mysql:8.0
+    container_name: exo_erp_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: VeryStrongRootPass!23
+      MYSQL_DATABASE: exoerp
+      MYSQL_USER: exoadmin
+      MYSQL_PASSWORD: VeryStrongUserPass!23
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  # MongoDB – read‑only fallback (free, keeps existing data)
+  mongo:
+    image: mongo:7
+    container_name: exo_erp_mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongoAdmin
+      MONGO_INITDB_ROOT_PASSWORD: MongoStrong!23
+    ports:
+      - "127.0.0.1:27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  # Optional tiny web UI for MongoDB (mongo‑express)
+  mongo-express:
+    image: mongo-express:latest
+    container_name: exo_erp_mongo_express
+    restart: unless-stopped
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: mongoAdmin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: MongoStrong!23
+      ME_CONFIG_MONGODB_SERVER: mongo
+    ports:
+      - "127.0.0.1:8081:8081"
+    depends_on:
+      - mongo
+
+volumes:
+  mysql_data:
+  mongo_data:

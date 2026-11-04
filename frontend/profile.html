@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | EXO GLOBAL</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/responsive-universal.css">
+    <style>
+        :root {
+            --primary: #0a192f;
+            --accent: #1d4ed8;
+            --bg: #f0f2f5;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-y: auto;
+        }
+
+        .header {
+            height: 80px;
+            background: white;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+        }
+
+        .header h1 {
+            font-family: 'Outfit';
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        #main {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px 40px;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 32px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            margin-bottom: 24px;
+        }
+
+        .p-banner {
+            height: 140px;
+            background: linear-gradient(135deg, #242526 0%, #3e2723 100%);
+        }
+
+        .p-header-content {
+            padding: 0 40px 30px;
+            display: flex;
+            align-items: flex-end;
+            gap: 32px;
+            position: relative;
+        }
+
+        .p-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 30px;
+            background: white;
+            padding: 6px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            margin-top: -60px;
+        }
+
+        .p-avatar-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 25px;
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Outfit';
+            font-size: 40px;
+            font-weight: 800;
+            color: white;
+        }
+
+        .p-name-sect {
+            padding-top: 20px;
+        }
+
+        .p-name-sect h2 {
+            font-family: 'Outfit';
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .p-name-sect p {
+            font-size: 15px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .section-title {
+            font-family: 'Outfit';
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--accent);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .val {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary);
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid transparent;
+            width: 100%;
+            display: block;
+            min-height: 40px;
+        }
+
+        input,
+        textarea,
+        select {
+            font-family: inherit;
+            font-size: 14px;
+            width: 100%;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 4px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-outline {
+            background: white;
+            border: 1px solid #e2e8f0;
+            color: var(--text-main);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+        }
+
+        .edit-mode .val {
+            display: none;
+        }
+
+        .view-mode .edit-ctrl {
+            display: none;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 4px;
+            color: white;
+            z-index: 100;
+            display: none;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%)
+            }
+
+            to {
+                transform: translateX(0)
+            }
+        }
+    
+        /* Mobile Responsiveness */
+        @media (max-width: 1024px) {
+            .content { grid-template-columns: 1fr !important; gap: 20px; padding: 20px; }
+            .dashboard-grid { grid-template-columns: 1fr !important; }
+            .metrics-grid { grid-template-columns: repeat(2, 1fr) !important; }
+            header, .topbar { padding: 0 20px !important; }
+        }
+        @media (max-width: 768px) {
+            body { flex-direction: column !important; }
+            #sidebar { width: 100% !important; height: auto !important; flex-direction: row !important; flex-wrap: wrap; justify-content: space-between; align-items: center; padding: 10px; z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.1); }
+            .logo { height: 40px !important; padding: 0 10px !important; border: none !important; font-size: 18px; width: 100%; justify-content: center; border-bottom: 1px solid rgba(255,255,255,0.05) !important; margin-bottom: 5px; }
+            .nav-list, nav { flex-direction: row !important; padding: 0 !important; width: 100% !important; overflow-x: auto !important; gap: 5px !important; align-items: center; }
+            .nav-item { padding: 8px 12px !important; font-size: 13px !important; white-space: nowrap !important; border-radius: 4px !important; }
+            .metrics-grid { grid-template-columns: 1fr !important; }
+            header, .topbar { height: auto !important; flex-direction: column !important; padding: 15px !important; align-items: stretch !important; gap: 15px !important; }
+            .search { width: 100% !important; }
+            .top-right { width: 100% !important; justify-content: space-between !important; }
+            .dashboard { padding: 15px !important; }
+            .modal { width: 95% !important; padding: 20px !important; border-radius: 12px !important; max-height: 80vh !important; }
+            .chat-container { flex-direction: column !important; }
+            .chat-sidebar { width: 100% !important; height: 250px !important; border-right: none !important; border-bottom: 1px solid var(--border) !important; flex-shrink: 0; }
+            .ticket-header { flex-direction: column !important; gap: 10px !important; align-items: flex-start !important; }
+            .action-bar { flex-direction: column !important; align-items: flex-start !important; gap: 15px !important; }
+            .detail-pane { border-radius: 12px !important; }
+            .btn { width: 100% !important; justify-content: center !important; }
+        }
+
+    
+/* ── SIDEBAR ── */
+#sidebar{width:250px;background:#1e293b;border-right:2px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
+@media (min-width: 769px) { #sidebar { height: 100vh; position: sticky; top: 0; } }
+.logo{height:100px;padding:0 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;justify-content:flex-start;}
+.logo-icon{width:52px;height:52px;border-radius:8px;background:transparent;display:flex;align-items:center;justify-content:center;overflow:hidden;border:none}
+.logo-icon img{width:100%;height:100%;object-fit:contain;border-radius:8px}
+.logo-text{font-family:'Outfit',sans-serif;font-size:18px;font-weight:800;color:#fff}
+#sidebar nav{flex:1;padding:18px 12px;display:flex;flex-direction:column;gap:6px;overflow-y:auto;}
+.nav-link{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:4px;color:#ffffff;text-decoration:none;font-weight:600;transition:.2s;border:1px solid transparent;font-size:13px}
+.nav-link:hover{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.05)}
+.nav-link.active{background:rgba(14,165,233,0.15);border:1px solid var(--primary);box-shadow:inset 3px 0 0 var(--primary)}
+.nav-link .count-badge{background:var(--primary);color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:99px;margin-left:auto}
+
+</style>
+</head>
+
+<body class="view-mode" style="display:flex; height:100vh; overflow:hidden;">
+    <aside id="sidebar"></aside>
+    <div style="flex:1; display:flex; flex-direction:column; overflow-y:auto; min-width:0;">
+    <header class="header">
+        <div style="display:flex; align-items:center; gap:15px;">
+            <a href="dashboard.html" style="color:var(--text-muted);"><i class="fa-solid fa-arrow-left"></i></a>
+            <h1>Employee Profile</h1>
+        </div>
+        <div style="display:flex; gap:20px; align-items:center;">
+            <div class="icon-btn" id="notif-bell-btn"
+                style="position:relative; cursor:pointer; color:var(--text-muted); font-size:18px;">
+                <i class="fa-regular fa-bell"></i>
+                <span class="badge" id="notif-badge"
+                    style="position:absolute; top:-5px; right:-5px; background:#ef4444; color:white; font-size:9px; width:14px; height:14px; border-radius:50%; display:none; align-items:center; justify-content:center;">0</span>
+            </div>
+            <button class="btn btn-primary" id="editBtn" onclick="toggleEdit()"
+                style="background: var(--accent); color: white;"><i class="fa-solid fa-pen"></i> Edit Profile</button>
+            <button class="btn btn-success edit-ctrl" onclick="saveProfile()"
+                style="background: #22c55e; color: white;"><i class="fa-solid fa-floppy-disk"></i> Save & Sync</button>
+            <button class="btn btn-outline edit-ctrl" onclick="toggleEdit()">Cancel</button>
+        </div>
+    </header>
+
+    <div id="main">
+        <div class="profile-card">
+            <div class="p-banner"></div>
+            <div class="p-header-content">
+                <div class="p-avatar">
+                    <div class="p-avatar-inner" id="pInitial">?</div>
+                </div>
+                <div class="p-name-sect">
+                    <h2 id="pNameDisp">Loading...</h2>
+                    <p id="pRoleDisp">—</p>
+                    <div style="margin-top:12px; display:flex; gap:8px;">
+                        <span id="pIdBadge"
+                            style="background:#f1f5f9; padding:4px 12px; border-radius:6px; font-size:12px; font-weight:800; color:var(--primary);">ID:
+                            —</span>
+                        <span id="pJoinBadge"
+                            style="background:#f0fdf4; padding:4px 12px; border-radius:6px; font-size:12px; font-weight:800; color:#16a34a;">Joined:
+                            —</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <form id="profileForm">
+            <div class="grid">
+                <div class="section">
+                    <div class="section-title">01. Identity</div>
+                    <div class="form-group">
+                        <label class="label">Full Name</label>
+                        <span class="val" id="fn_v"></span>
+                        <input type="text" name="fullName" class="edit-ctrl">
+                    </div>
+                    <div class="form-group">
+                        <label class="label">Date of Birth</label>
+                        <span class="val" id="dob_v"></span>
+                        <input type="date" name="dob" class="edit-ctrl">
+                    </div>
+                    <div class="form-group">
+                        <label class="label">Blood Group</label>
+                        <span class="val" id="bg_v"></span>
+                        <input type="text" name="bloodGroup" class="edit-ctrl">
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">02. Professionals</div>
+                    <div class="form-group">
+                        <label class="label">Department</label>
+                        <span class="val" id="dept_v"></span>
+                        <input type="text" name="department" class="edit-ctrl" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="label">Designation</label>
+                        <span class="val" id="des_v"></span>
+                        <input type="text" name="designation" class="edit-ctrl">
+                    </div>
+                    <div class="form-group">
+                        <label class="label">Qualifications</label>
+                        <span class="val" id="qual_v"></span>
+                        <input type="text" name="qualification" class="edit-ctrl">
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">03. Contact Info</div>
+                    <div class="form-group">
+                        <label class="label">WhatsApp Number</label>
+                        <span class="val" id="wa_v"></span>
+                        <input type="text" name="whatsappNumber" class="edit-ctrl">
+                    </div>
+                    <div class="form-group">
+                        <label class="label">Phone</label>
+                        <span class="val" id="ph_v"></span>
+                        <input type="text" name="phone" class="edit-ctrl">
+                    </div>
+                    <div class="form-group">
+                        <label class="label">Email</label>
+                        <span class="val" id="em_v"></span>
+                        <input type="email" name="email" class="edit-ctrl" readonly>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">04. Government ID</div>
+                    <div class="form-group">
+                        <label class="label">NIF Number</label>
+                        <span class="val" id="nif_v"></span>
+                        <input type="text" name="nif" class="edit-ctrl">
+                    </div>
+                    <div class="form-group">
+                        <label class="label">Passport Number</label>
+                        <span class="val" id="pass_v"></span>
+                        <input type="text" name="passportNumber" class="edit-ctrl">
+                    </div>
+                    <div class="form-group">
+                        <label class="label">IBAN</label>
+                        <span class="val" id="iban_v"></span>
+                        <input type="text" name="iban" class="edit-ctrl">
+                    </div>
+                </div>
+
+                <div class="section" style="grid-column: 1/-1;">
+                    <div class="section-title">05. Addresses</div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                        <div class="form-group">
+                            <label class="label">Permanent Address</label>
+                            <span class="val" id="paddr_v"></span>
+                            <textarea name="permanentAddress" class="edit-ctrl"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="label">Current Address</label>
+                            <span class="val" id="caddr_v"></span>
+                            <textarea name="currentAddress" class="edit-ctrl"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </form>
+    </div>
+
+    <div id="toast" class="toast"></div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/';
+
+        const form = document.getElementById('profileForm');
+        let currentData = {};
+
+        function initOAuth() {
+            if (!provider) return alert('Please select a provider first');
+
+            document.getElementById('syncIndicator').style.display = 'block';
+
+            // Dedicated OAuth for primary enterprise services
+            if (provider === 'Google' || provider === 'Outlook') {
+                const url = provider === 'Google' ? '/api/calendar/auth/google?token=' + token : '/api/calendar/auth/microsoft?token=' + token;
+                const win = window.open(url, 'Connect Calendar', 'width=600,height=600');
+
+                window.addEventListener('message', (e) => {
+                    if (e.data === 'google-success' || e.data === 'microsoft-success') {
+                        document.getElementById('syncIndicator').style.display = 'none';
+                        showToast('Live connection verified!', '#22c55e');
+                        loadProfile();
+                    }
+                });
+            } else {
+                // Manual/Direct sync for others
+                saveProfile();
+                document.getElementById('syncIndicator').style.display = 'none';
+                showToast('Sync enabled for ' + provider, '#22c55e');
+            }
+        }
+
+        async function loadProfile() {
+            try {
+                const res = await fetch('/api/auth/profile', { headers: { Authorization: `Bearer ${token}` } });
+                const data = await res.json();
+                currentData = data;
+                fillData(data);
+
+                // Show connect button based on current selection
+                checkProviderChange(data.calendarProvider);
+            } catch (err) { console.error(err); }
+        }
+
+        function checkProviderChange(val) {
+            const cBtn = document.getElementById('connectBtn');
+            const cHint = document.getElementById('connectHint');
+            if (val && val !== "") {
+                cBtn.style.display = 'flex';
+                cHint.style.display = 'block';
+                cBtn.innerHTML = (val === 'Other')
+                    ? '<i class="fa-solid fa-floppy-disk"></i> Save Settings'
+                    : '<i class="fa-solid fa-plug"></i> Connect Live Now';
+            } else {
+                cBtn.style.display = 'none';
+                cHint.style.display = 'none';
+            }
+        }
+
+        function fillData(u) {
+            document.getElementById('pInitial').innerText = u.fullName.charAt(0);
+            document.getElementById('pNameDisp').innerText = u.fullName;
+            document.getElementById('pRoleDisp').innerText = `${u.role} · ${u.designation || 'Member'}`;
+            document.getElementById('pIdBadge').innerText = `ID: ${u.employeeId}`;
+            document.getElementById('pJoinBadge').innerText = `Joined: ${u.joiningDate || 'N/A'}`;
+
+            const fields = [
+                { id: 'fn', n: 'fullName' }, { id: 'dob', n: 'dob' }, { id: 'bg', n: 'bloodGroup' },
+                { id: 'dept', n: 'department' }, { id: 'des', n: 'designation' }, { id: 'qual', n: 'qualification' },
+                { id: 'wa', n: 'whatsappNumber' }, { id: 'ph', n: 'phone' }, { id: 'em', n: 'email' },
+                { id: 'nif', n: 'nif' }, { id: 'pass', n: 'passportNumber' }, { id: 'iban', n: 'iban' },
+                { id: 'paddr', n: 'permanentAddress' }, { id: 'caddr', n: 'currentAddress' },
+                { id: 'cp', n: 'calendarProvider' }, { id: 'ce', n: 'calendarEmail' }
+            ];
+
+            fields.forEach(f => {
+                const v = u[f.n] || '—';
+                document.getElementById(f.id + '_v').innerText = v;
+                if (form[f.n]) form[f.n].value = u[f.n] || '';
+            });
+        }
+
+        function toggleEdit() {
+            document.body.classList.toggle('edit-mode');
+            document.body.classList.toggle('view-mode');
+        }
+
+        async function saveProfile() {
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const res = await fetch('/api/auth/profile', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                    body: JSON.stringify(data)
+                });
+                if (res.ok) {
+                    showToast('Profile updated successfully!', '#22c55e');
+                    loadProfile();
+                    toggleEdit();
+                } else {
+                    showToast('Update failed!', '#ef4444');
+                }
+            } catch (e) { showToast('Connection error', '#ef4444'); }
+        }
+
+        function showToast(msg, bg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.style.background = bg;
+            t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 3000);
+        }
+
+        loadProfile().then(() => {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('edit') === 'calendar') {
+                toggleEdit();
+                document.getElementById('calendarSection').scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    </script>
+    <script src="js/sidebar.js"></script>
+    <script src="/js/nav-sync.js"></script>
+    <script src="/js/notifications.js"></script>
+</body>
+
+</html>

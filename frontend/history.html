@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History Center | EXO GLOBAL</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/responsive-universal.css">
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --border-soft: #f1f5f9;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --primary: #011638;
+            --accent: #2563eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+        }
+        .topbar {
+            height: 70px;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+        .top-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .profile:hover {
+            background: rgba(0,0,0,0.04);
+        }
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #2563eb;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 15px;
+            box-shadow: 0 2px 6px rgba(37,99,235,0.3);
+        }
+        .tabs-header {
+            display: flex;
+            gap: 12px;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 24px;
+            padding-bottom: 2px;
+            overflow-x: auto;
+        }
+        .tab-btn {
+            padding: 12px 20px;
+            border: none;
+            background: none;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+        .tab-btn:hover {
+            color: var(--accent);
+            background: rgba(37, 99, 235, 0.04);
+            border-radius: 6px 6px 0 0;
+        }
+        .tab-btn.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+        .tab-btn .tab-count {
+            background: var(--border-soft);
+            color: var(--text-muted);
+            font-size: 10px;
+            padding: 2px 7px;
+            border-radius: 99px;
+            font-weight: 700;
+        }
+        .tab-btn.active .tab-count {
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--accent);
+        }
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .history-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 16px 20px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+        }
+        .history-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.06);
+            border-color: #cbd5e1;
+        }
+        .history-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+        .item-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .item-title {
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 14px;
+            margin-bottom: 4px;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .item-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .item-status {
+            padding: 5px 12px;
+            border-radius: 99px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .status-done {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+        .status-deleted {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 50px 30px;
+            background: var(--surface);
+            border: 1px dashed #cbd5e1;
+            border-radius: 14px;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 10px 0;
+        }
+        .empty-state-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+        .empty-state-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+        .empty-state-desc {
+            font-size: 12px;
+            max-width: 320px;
+            line-height: 1.5;
+        }
+    
+/* ── SIDEBAR ── */
+#sidebar{width:250px;background:#1e293b;border-right:2px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
+@media (min-width: 769px) { #sidebar { height: 100vh; position: sticky; top: 0; } }
+.logo{height:100px;padding:0 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;justify-content:flex-start;}
+.logo-icon{width:52px;height:52px;border-radius:8px;background:transparent;display:flex;align-items:center;justify-content:center;overflow:hidden;border:none}
+.logo-icon img{width:100%;height:100%;object-fit:contain;border-radius:8px}
+.logo-text{font-family:'Outfit',sans-serif;font-size:18px;font-weight:800;color:#fff}
+#sidebar nav{flex:1;padding:18px 12px;display:flex;flex-direction:column;gap:6px;overflow-y:auto;}
+.nav-link{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:4px;color:#ffffff;text-decoration:none;font-weight:600;transition:.2s;border:1px solid transparent;font-size:13px}
+.nav-link:hover{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.05)}
+.nav-link.active{background:rgba(14,165,233,0.15);border:1px solid var(--primary);box-shadow:inset 3px 0 0 var(--primary)}
+.nav-link .count-badge{background:var(--primary);color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:99px;margin-left:auto}
+
+</style>
+</head>
+<body>
+    <div style="display:flex; height:100vh;">
+        <!-- Sidebar placeholder for nav-sync -->
+        
+<aside id="sidebar">
+    <div class="logo"><img src="exologo.png?v=2" class="sidebar-logo" style="width:80px;height:80px;border-radius:8px;object-fit:contain;"/></div>
+    <nav>
+        <a href="dashboard.html" class="nav-link"><i class="fa-solid fa-house"></i> Dashboard</a>
+        <a href="employees.html" class="nav-link"><i class="fa-solid fa-users"></i> Employees</a>
+        <a href="attendance.html" class="nav-link"><i class="fa-solid fa-user-check"></i> Attendance</a>
+        <a href="tickets.html" class="nav-link"><i class="fa-solid fa-ticket"></i> Tickets</a>
+        <a href="chat.html" class="nav-link"><i class="fa-solid fa-message"></i> Chat</a>
+        <a href="meeting.html" class="nav-link"><i class="fa-solid fa-video"></i> Live Meeting</a>
+        <a href="documents.html" class="nav-link"><i class="fa-solid fa-folder-open"></i> Documents</a>
+        <a href="history.html" class="nav-link"><i class="fa-solid fa-clock-rotate-left"></i> History Center</a>
+        <a href="undertakings.html" class="nav-link" id="navUndertakings" style="display:none;"><i class="fa-solid fa-handshake"></i> Undertakings</a>
+        <div style="flex:1"></div>
+        <a href="profile.html" class="nav-link"><i class="fa-solid fa-id-badge"></i> My Profile</a>
+        <a href="javascript:void(0)" onclick="logout()" class="nav-link" style="color:var(--danger)"><i class="fa-solid fa-power-off"></i> Logout</a>
+    </nav>
+</aside>
+
+
+        <main style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
+            <header class="topbar">
+                <div class="page-title" style="font-family:'Outfit'; font-weight:800; font-size:24px; color:var(--primary);"><i class="fa-solid fa-clock-rotate-left"></i> History Center</div>
+                <div class="top-right">
+                    <div class="profile" onclick="window.location.href='profile.html'">
+                        <div style="text-align:right"><div id="uName" style="font-weight:600;">User</div><div id="uRole" style="font-size:11px;color:var(--text-muted);">Role</div></div>
+                        <div class="avatar" id="uAv">U</div>
+                    </div>
+                </div>
+            </header>
+
+            <div style="padding: 24px; overflow-y: auto; flex: 1;">
+                <div class="tabs-header">
+                    <button class="tab-btn active" onclick="switchTab('todos')">
+                        <i class="fa-solid fa-check-square"></i> Completed To-Dos
+                        <span class="tab-count" id="count-todos">0</span>
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('reminders')">
+                        <i class="fa-solid fa-bell-slash"></i> Completed Reminders
+                        <span class="tab-count" id="count-reminders">0</span>
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('tickets')">
+                        <i class="fa-solid fa-ticket-simple"></i> Deleted Tickets
+                        <span class="tab-count" id="count-tickets">0</span>
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('documents')">
+                        <i class="fa-solid fa-file-excel"></i> Deleted Documents
+                        <span class="tab-count" id="count-documents">0</span>
+                    </button>
+                </div>
+
+                <!-- Completed To-Dos -->
+                <div id="tab-todos" class="tab-content active">
+                    <div class="history-list" id="todosList">
+                        <div style="text-align:center; padding:30px; color:var(--text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> Loading Completed To-Dos...</div>
+                    </div>
+                </div>
+
+                <!-- Completed Reminders -->
+                <div id="tab-reminders" class="tab-content">
+                    <div class="history-list" id="remindersList">
+                        <div style="text-align:center; padding:30px; color:var(--text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> Loading Completed Reminders...</div>
+                    </div>
+                </div>
+
+                <!-- Deleted Tickets -->
+                <div id="tab-tickets" class="tab-content">
+                    <div class="history-list" id="ticketsList">
+                        <div style="text-align:center; padding:30px; color:var(--text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> Loading Deleted Tickets...</div>
+                    </div>
+                </div>
+
+                <!-- Deleted Documents -->
+                <div id="tab-documents" class="tab-content">
+                    <div class="history-list" id="documentsList">
+                        <div style="text-align:center; padding:30px; color:var(--text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> Loading Deleted Documents...</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/nav-sync.js?v=2"></script>
+    <script src="/js/history.js"></script>
+</body>
+</html>

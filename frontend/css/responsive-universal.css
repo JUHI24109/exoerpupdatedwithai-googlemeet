@@ -1,0 +1,427 @@
+/* ==========================================================================
+   EXO GLOBAL ENTERPRISE ERP — UNIVERSAL RESPONSIVE STYLESHEET
+   100% Seamless Adaptive Layout across:
+   - Mobile Phones (iOS Safari, Android Chrome, Samsung Internet)
+   - Tablets & Foldables (iPad, iPad Pro, Android Tablets, Surface)
+   - Laptops & Desktops (macOS Safari, MacBook, Windows, Linux, 4K Displays)
+   ========================================================================== */
+
+/* ── 1. Root & Mobile Safe Area Variables ── */
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --mobile-nav-height: 60px;
+}
+
+/* ── 2. Global Reset & Box Sizing ── */
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Default Desktop Triple Grid & Chat Button */
+.dashboard-triple-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.mobile-chat-back-btn {
+  display: none;
+}
+
+/* ── 3. Desktop View (>= 993px) ── */
+@media (min-width: 993px) {
+  #exo-mobile-topbar {
+    display: none !important;
+  }
+  #exo-sidebar-backdrop {
+    display: none !important;
+  }
+}
+
+/* ── 4. Mobile & Tablet Universal Adaptive Layout (<= 992px) ── */
+@media (max-width: 992px) {
+  body {
+    flex-direction: column !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    overflow: hidden !important;
+    padding-top: calc(var(--mobile-nav-height) + var(--safe-top)) !important;
+  }
+
+  /* ── Mobile Top Navigation Bar ── */
+  #exo-mobile-topbar {
+    display: flex !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: calc(var(--mobile-nav-height) + var(--safe-top)) !important;
+    padding-top: var(--safe-top) !important;
+    padding-left: max(16px, var(--safe-left)) !important;
+    padding-right: max(16px, var(--safe-right)) !important;
+    background: #1e293b !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    z-index: 99990 !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25) !important;
+  }
+
+  .mobile-menu-hamburger {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 8px !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #fff !important;
+    border: none !important;
+    font-size: 18px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: background 0.2s !important;
+  }
+
+  .mobile-menu-hamburger:active {
+    background: rgba(255, 255, 255, 0.16) !important;
+  }
+
+  .mobile-brand-logo {
+    height: 34px !important;
+    max-width: 140px !important;
+    object-fit: contain !important;
+    filter: brightness(0) invert(1) !important;
+  }
+
+  .mobile-topbar-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  .mobile-install-btn {
+    background: linear-gradient(135deg, #0ea5e9, #6366f1) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 7px 12px !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3) !important;
+  }
+
+  /* ── Sliding Off-Canvas Drawer Sidebar ── */
+  #sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 290px !important;
+    max-width: 82vw !important;
+    height: 100dvh !important;
+    background: #0f172a !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+    z-index: 100000 !important;
+    transform: translate3d(-100%, 0, 0) !important;
+    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    box-shadow: none !important;
+    padding-top: var(--safe-top) !important;
+    padding-bottom: var(--safe-bottom) !important;
+  }
+
+  #sidebar.mobile-open {
+    transform: translate3d(0, 0, 0) !important;
+    box-shadow: 16px 0 50px rgba(0, 0, 0, 0.7) !important;
+  }
+
+  /* ── Dark Backdrop Overlay ── */
+  #exo-sidebar-backdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(0, 0, 0, 0.65) !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+    z-index: 99995 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 0.3s ease !important;
+  }
+
+  #exo-sidebar-backdrop.active {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  /* ── Drawer Close Button ── */
+  .drawer-close-btn {
+    position: absolute !important;
+    top: max(16px, var(--safe-top)) !important;
+    right: 14px !important;
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #fff !important;
+    border: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 16px !important;
+    cursor: pointer !important;
+  }
+
+  /* ── Main Content Container ── */
+  main {
+    flex: 1 !important;
+    width: 100% !important;
+    height: calc(100dvh - (var(--mobile-nav-height) + var(--safe-top))) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding-bottom: max(20px, var(--safe-bottom)) !important;
+  }
+
+  /* Headers & Topbars on Mobile */
+  header, .page-header, .topbar {
+    height: auto !important;
+    min-height: 56px !important;
+    padding: 12px 16px !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+  }
+
+  header h1, .page-header h1 {
+    font-size: 18px !important;
+  }
+
+  .header-actions, .top-right, .actions-bar {
+    width: 100% !important;
+    justify-content: flex-start !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  /* Filter & Search Bars */
+  .filter-bar, .search-bar, .toolbar {
+    padding: 10px 16px !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+
+  .search-box, .search-wrap {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  /* Metric & KPI Cards */
+  .metrics-grid, .stats-row, .kpi-row, .stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  @media (min-width: 540px) and (max-width: 992px) {
+    .metrics-grid, .stats-row, .kpi-row, .stats-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+  }
+
+  /* Grid layouts for Projects, Tickets, Tasks */
+  .projects-grid, .cards-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  @media (min-width: 680px) and (max-width: 992px) {
+    .projects-grid, .cards-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+  }
+
+  /* Form Rows */
+  .form-row, .row, .form-grid {
+    flex-direction: column !important;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  /* Bento & Complex Grids (Dashboard & Profile Mapping) */
+  .bento-grid, .report-grid, .dashboard-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  [class*="bento-col-"], [class*="col-span-"] {
+    grid-column: span 1 / span 1 !important;
+  }
+
+  /* Project Workspace Overview & Layouts */
+  .overview-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .tab-panel {
+    padding: 16px 14px !important;
+  }
+
+  .hero-content {
+    padding: 16px 14px !important;
+  }
+
+  .project-hero {
+    height: auto !important;
+    min-height: 190px !important;
+  }
+
+  /* Modals */
+  .modal, .modal-content, .modal-dialog {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    max-height: 88dvh !important;
+    margin: 10px auto !important;
+    overflow-y: auto !important;
+  }
+
+  /* Prevent unwanted auto-zoom on iOS inputs */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+
+  /* Responsive Tables */
+  table {
+    min-width: 580px !important;
+  }
+
+  .table-responsive, .table-wrapper, .table-container, .card-table-wrapper {
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    position: relative !important;
+  }
+
+  /* Project Workspace Tabs */
+  .workspace-tabs, .tabs-header, .nav-tabs {
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    white-space: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding-bottom: 4px !important;
+  }
+
+  /* Dashboard Triple Grid (Charts & Todo/Reminders/Operations) */
+  .dashboard-triple-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  @media (min-width: 720px) and (max-width: 992px) {
+    .dashboard-triple-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+  }
+
+  /* Enterprise Chat Universal Adaptive Layout (WhatsApp-Style) */
+  .app-container {
+    display: flex !important;
+    width: 100% !important;
+    height: 100% !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    position: relative !important;
+  }
+
+  /* State 1: When chat is NOT open, show Contact list 100% and hide conversation */
+  .app-container .sidebar {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    border-right: none !important;
+  }
+
+  .app-container .chat-area {
+    display: none !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    border-left: none !important;
+  }
+
+  /* State 2: When conversation is open (.mobile-chat-open), hide Contact list and show chat 100% */
+  .app-container.mobile-chat-open .sidebar {
+    display: none !important;
+  }
+
+  .app-container.mobile-chat-open .chat-area {
+    display: flex !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+  }
+
+  .mobile-chat-back-btn {
+    display: inline-flex !important;
+  }
+}
+
+/* ── 5. Small Mobile / iPhone Portrait Screens (<= 480px) ── */
+@media (max-width: 480px) {
+  .page-header h1, header h1 {
+    font-size: 17px !important;
+  }
+
+  .btn-primary, .btn-submit, .btn-create {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .modal-footer {
+    flex-direction: column-reverse !important;
+    gap: 8px !important;
+  }
+
+  .modal-footer button {
+    width: 100% !important;
+  }
+
+  #exo-floating-ai-btn {
+    bottom: 20px !important;
+    right: 16px !important;
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 19px !important;
+  }
+}
+
+/* ── 6. Horizontal Scroll Bar Touch Polish ── */
+.table-responsive::-webkit-scrollbar,
+.workspace-tabs::-webkit-scrollbar,
+#sidebar nav::-webkit-scrollbar {
+  height: 4px;
+  width: 4px;
+}
+.table-responsive::-webkit-scrollbar-thumb,
+.workspace-tabs::-webkit-scrollbar-thumb,
+#sidebar nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}

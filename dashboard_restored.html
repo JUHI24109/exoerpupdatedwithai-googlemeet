@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard | EXO GLOBAL</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+    async function downloadBackup() {
+        try {
+            const res = await fetch('/api/backup/tickets', { headers: { Authorization: `Bearer ${token}` } });
+            if (!res.ok) return alert('Backup failed or unauthorized');
+            const blob = await res.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'EXO_TICKETS_BACKUP_' + new Date().getTime() + '.json';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            alert('✅ Secure Database Backup Downloaded Successfully!');
+        } catch(e) { console.error('Backup error:', e); alert('Failed to download backup.'); }
+    }
+</script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>:root {
+    --bg:#ffffff;
+    --surface:#f3f4f6;
+    --border:#334155;
+    --border
+    --text-main:#111827;
+    --text-light:#6b7280;
+    --primary:#011638; /* Navy blue primary */
+    --primary-dark:#000c20; /* Darker navy */
+    --accent:#2563eb;
+    --success:#16a34a;
+    --danger:#dc2626;
+    --warning:#d97706;
+    --pink-bg:#f1f5f9;
+    --pink-light:#e2e8f0;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-main);height:100vh;display:flex;overflow:hidden;font-size:13px}
+
+/* ── SIDEBAR ── */
+        #sidebar {width:250px;background: var(--primary);border-right:2px solid var(--border);display:flex;flex-direction:column;flex-shrink:0 color: #ffffff;}
+#sidebarContainer {width:250px;background: var(--primary);border-right:2px solid var(--border);display:flex;flex-direction:column;flex-shrink:0 color: #ffffff;}
+#sidebarContainer {width:250px;background: var(--primary);border-right:2px solid var(--border);display:flex;flex-direction:column;flex-shrink:0 color: #ffffff;}
+        .logo{height:72px;padding:0 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.logo-icon{width:52px;height:52px;border-radius:8px;background:transparent;display:flex;align-items:center;justify-content:center;overflow:hidden;border:none}
+        .logo-icon img{width:100%;height:100%;object-fit:contain;border-radius:8px}
+.logo-text {font-family:'Outfit',sans-serif;font-size:18px;font-weight:800;color: #ffffff;padding:18px 12px;display:flex;flex-direction:column;gap:6px}
+.nav-link {display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:4px;color: rgba(255,255,255,0.7);text-decoration:none;font-weight:600;transition:.2s;border:1px solid transparent;font-size:13px}
+        .nav-link:hover{background:
+        .nav-link.active { background: rgba(255,255,255,0.1); color: #ffffff; box-shadow: inset 3px 0 0 #3b82f6; }
+        .nav-link .count-badge{background:var(--primary);color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:99px;margin-left:auto}
+
+/* ── MAIN ── */
+        main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;background:#f1f5f9}
+        header{height:72px;border-bottom:2px solid var(--border);padding:0 26px;display:flex;align-items:center;justify-content:space-between;background:var(--surface)}
+        header h1{font-family:'Outfit',sans-serif;font-size:22px;color:var(--primary);font-weight:800}
+        .top-right{display:flex;align-items:center;gap:16px}
+        .top-right-profile{display:flex;align-items:center;gap:10px;padding-left:16px;border-left:1px solid var(--border)}
+        .top-right-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#8b5cf6);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px}
+
+        /* ── DASHBOARD GRID ── */
+        .dashboard-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px}
+        .dashboard-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+        .badge-ok{background:#dcfce7;color:#166534}
+        .badge-no{background:#fee2e2;color:#991b1b}
+        .badge-hold{background:#ede9fe;color:#5b21b6}
+
+        /* ── SCROLLBAR ── */
+        ::-webkit-scrollbar{width:6px}
+        ::-webkit-scrollbar-track{background:transparent}
+        ::-webkit-scrollbar-thumb{background:var(--border-soft);border-radius:99px}
+        ::-webkit-scrollbar-thumb:hover{background:var(--border)}
+    
+        .bento-card { background: var(--surface); border: 2px solid var(--border-soft); border-radius: 6px; padding: 16px; display: flex; flex-direction: column; transition: border-color .2s, box-shadow .2s; }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px; }
+        .kpi-title { font-size: 11px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: .7px; margin-bottom: 6px; }
+        .kpi-val { font-family: 'Outfit', sans-serif; font-size: 30px; font-weight: 800; color: #111827; }
+        .chart-container { position: relative; width: 100%; height: 220px; }
+        .charts-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        @media (max-width: 1024px) { .charts-row { grid-template-columns: repeat(2, 1fr) !important; } }
+        @media (max-width: 768px) { .charts-row { grid-template-columns: 1fr !important; } }
+    .modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modal.hidden { display: none; }
+.modal-content {
+  background: var(--surface);
+  padding: 20px;
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+                    <div class="kpi-trend">Resolved</div>
+                </div>
+                <div class="bento-card">
+                    <div class="kpi-title"><i class="fa-solid fa-clock-rotate-left" style="color:var(--danger)"></i> Overdue Tickets</div>
+                    <div class="kpi-val" id="kpi-overdue">0</div>
+                    <div class="kpi-trend" style="color:var(--danger)">Past Deadline</div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <!-- Charts Row -->
+            <div class="charts-row">
+                <div class="bento-card chart-card" style="display:flex; flex-direction:row; align-items:center;">
+                    <div style="flex:1;">
+                        <div class="kpi-title">Ticket Status Distribution</div>
+                        <div class="chart-container" style="height:180px;"><canvas id="statusDonutChart"></canvas></div>
+                    </div>
+                    <div id="statusLegend" style="width:120px; font-size:12px; font-weight:600; display:flex; flex-direction:column; gap:8px;"></div>
+                </div>
+                <div class="bento-card chart-card" style="display:flex; flex-direction:row; align-items:center;">
+                    <div style="flex:1;">
+                        <div class="kpi-title">Ticket Priorities</div>
+                        <div class="chart-container" style="height:180px;"><canvas id="priorityPieChart"></canvas></di
+             
+                    <div id="priorityLegend" style="width:120px; font-size:12px; font-weight:600; display:flex; flex-direction:column; gap:8px;"></div>
+                </div>
+                <div class="bento-card" style="display:flex; flex-direction:row; align-items:center;">
+    <div style="flex:1;">
+        <div class="kpi-title">My Raised Tickets Performance</div>
+        <div class="chart-container" style="height:200px;">
+            <canvas id="myPerformanceChart"></canvas>
+        </div>
+    </div>
+</div>
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+                        <i class="fa-solid fa-list-check"></i> My To-Do
+                    </div>
+                    <div style="display:flex;gap:6px;">
+                        <input type="text" id="dashTdTitle" placeholder="Add task..." style="flex:1;padding:8px 10px;font-size:12px;border:1px solid var(--border);border-radius:4px;">
+                        <button onclick="dashAddTodo()" style="background:var(--primary);color:white;border:none;border-radius:4px;padding:8px 12px;cursor:pointer;font-weight:600;font-size:11px;">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+                    <div id="dashMyTodoList" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:6px;max-height:200px;">
+                    </div>
+                </div>
+
+                <!-- REMINDERS -->
+                <div class="bento-card" style="display:flex;flex-direction:column;gap:10px;">
+                    <div style="font-size:14px;font-weight:700;color:var(--primary);padding-bottom:8px;border-bottom:2px solid var(--border);">
+                        <i class="fa-solid fa-bell"></i> Reminders
+                    </div>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                        <input type="text" id="dashRemMsg" placeholder="Reminder..." style="flex:1;min-width:80px;padding:8px 10px;font-size:12px;border:1px solid var(--border);border-radius:4px;">
+                        <input type="date" id="dashRemDate" style="width:110px;padding:8px;font-size:12px;border:1px solid var(--border);border-radius:4px;">
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/notifications.js"></script>
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/';
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        document.getElementById('userName').innerText = user.name || user.fullName || 'User';
+        document.getElementById('userInitial').innerText = (user.name || user.fullName || 'U').charAt(0).toUpperCase();
+
+        // Dynamic greeting based on time of day
+        const empId = (user.employeeId || '').toUpperCase();
+        const h = new Date().getHours();
+        const greeting = h < 12 ? 'Good Morning' : h < 17 ? 'Good Afternoon' : 'Good Evening';
+        let greetingText = '';
+        let titleText = 'Command Center';
+        if (empId === 'EXO-001') { greetingText = `${greeting}, Mr. Chairman!`; titleText = 'Chairman Command Center'; }
+        else if (empId === 'EXO-002') { greetingText = `${greeting}, Mr. CEO!`; titleText = 'CEO Command Center'; }
+        else if (empId === 'EXO-101') { greetingText = `${greeting}, Mr. IT Admin!`; titleText = 'IT Admin Command Center'; }
+        else if (empId === 'EXO-201') { greetingText = `${greeting}, Ms. HR!`; titleText = 'HR Command Center'; }
+        else { greetingText = `${greeting}, ${user.name || user.fullName || 'Employee'}!`; titleText = 'Employee Dashboard'; }
+        
+        document.getEle
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+                    method: 'DELETE',
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                loadLists();
+            } catch(e) { console.error(e); }
+        }
+
+        initDashboard();
+        loadLists();
+    
+// ── DASHBOARD TODO WIDGET ──
+async function dashLoadMyTodos() {
+    const list = document.getElementById('dashMyTodoList');
+    if (!list) return;
+    try {
+        const res = await fetch('/api/todos', { headers: { Authorization: `Bearer ${token}` } });
+        const todos = await res.json();
+        list.innerHTML = '';
+        const active = Array.isArray(todos) ? todos.filter(t => !t.isDeleted) : [];
+        if (!active.length) {
+            list.innerHTML = '<div style="color:var(--text-light);text-align:center;padding:20px;font-size:13px;">No tasks yet. Add one above!</div>';
+            return;
+        }
+        active.forEach(t => {
+            const item = document.createElement('div');
+            item.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f8fafc;border:1px solid var(--border);border-radius:4px;';
+            item.innerHTML = `
+                <div>
+                    <div style="font-weight:600;font-size:13px;color:var(--text-main);">${t.title}</div>
+                    ${t.reminderMonth ? `<div style="font-size:11px;color:#4f46e5;margin-top:2px;"><i class="fa-solid fa-calendar-days"></i> ${t.reminderMonth}</div>` : ''}
+                </div>
+                <button onclick="dashDoneTodo(${t.id})" style="background:#16a34a;color:white;border:none;border-radius:4px;padding:5px 12px;cursor:pointer;font-size:12px;font-weight:7
+                    <i class="fa-solid fa-check"></i> Done
+                </button>`;
+            list.appendChild(item);
+        });
+    } catch(e) { console.error('dashLoadMyTodos error:', e); }
+}
+
+async function dashAddTodo() {
+    const titleEl = document.getElementById('dashTdTitle');
+    const monthEl = document.getElementById('dashTdMonth');
+    const title = titleEl ? titleEl.value.trim() : '';
+    const month = monthEl ? monthEl.value : '';
+    if (!title) { alert('Please enter a task description'); return; }
+    try {
+        await fetch('/api/todos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ title, reminderMonth: month || null })
+        });
+        if (titleEl) titleEl.value = '';
+        if (monthEl) monthEl.value = '';
+        await dashLoadMyTodos();
+        await dashLoadGlobalTodos();
+    } catch(e) { console.error('dashAddTodo error:', e); }
+}
+
+async function dashDoneTodo(id) {
+    try {
+        await fetch(`/api/todos/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+        await dashLoadMyTodos();
+        await dashLoadGlobalTodos();
+    } catch(e) { console.error('dashDoneTodo error:', e); }
+}
+
+async function dashLoadGlobalTodos() {
+    const tbody = document.getElementById('dashGlobalTodoTable');
+    if (!tbody) return;
+    try {
+        const res = await fetch('/api/todos/all', { headers: { Authorization: `Bearer ${token}` } });
+        const todos = await res.json();
+        tbody.innerHTML 
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+<!-- Missing Line -->
+}
+
+dashLoadMyTodos();
+dashLoadGlobalTodos();
+
+
+</script>
+<div id="emailModal" class="modal hidden">
+  <div class="modal-content">
+    <h2>Connect Email Account</h2>
+    <input type="email" id="emailInput" placeholder="you@example.com" />
+    <div class="modal-actions">
+      <button id="emailSaveBtn" class="btn btn-primary">Save</button>
+      <button id="emailCancelBtn" class="btn btn-danger">Cancel</button>
+    </div>
+  </div>
+</div>
+<script>
+  const emailBtn = document.getElementById('emailBtn');
+  const emailModal = document.getElementById('emailModal');
+  const emailInput = document.getElementById('emailInput');
+  const saveBtn = document.getElementById('emailSaveBtn');
+  const cancelBtn = document.getElementById('emailCancelBtn');
+
+  emailBtn.addEventListener('click', () => {
+    emailModal.classList.remove('hidden');
+    emailInput.value = localStorage.getItem('connectedEmail') || '';
+  });
+
+  saveBtn.addEventListener('click', () => {
+    const email = emailInput.value.trim();
+    if (email) {
+      localStorage.setItem('connectedEmail', email);
+      // Redirect directly to Gmail inbox for the connected email
+      const gmailUrl = `https://mail.google.com/mail/u/?authuser=${encodeURIComponent(email)}`;
+      window.open(gmailUrl, '_blank');
+    } else {
+      alert('Please enter a valid email address.');
+    }
+    emailModal.classList.add('hidden');
+  });
+
+  cancelBtn.addEventListener('click', () => {
+    emailModal.classList.add('hidden');
+  });
+</script>
+<script src="js/logo-fix.js"></script>
+</body>
+</html>
+
