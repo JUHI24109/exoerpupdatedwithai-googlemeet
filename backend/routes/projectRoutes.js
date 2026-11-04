@@ -81,10 +81,19 @@ async function generateProjectId() {
 async function getProjectMemberIds(projectId) {
   try {
     const members = await ProjectMember.findAll({ where: { projectId }, attributes: ['userId'] });
-    const project = await Project.findByPk(projectId, { attributes: ['createdBy'] });
+    const project = await Project.findByPk(projectId, { attributes: ['createdBy', 'projectManagerId'] });
     const ids = members.map(m => m.userId);
     if (project && project.createdBy) ids.push(project.createdBy);
-    return ids;
+    if (project && project.projectManagerId) ids.push(project.projectManagerId);
+
+    // Include Super Roles (Chairman, CEO, IT Admin) so executives receive real-time notifications & badges
+    const superUsers = await User.findAll({
+      where: { role: { [Op.in]: ['IT Admin', 'Chairman', 'CEO'] } },
+      attributes: ['id']
+    });
+    superUsers.forEach(u => ids.push(u.id));
+
+    return [...new Set(ids)];
   } catch (e) {
     return [];
   }
@@ -384,7 +393,10 @@ router.post('/:id/tasks', protect, async (req, res) => {
       ]
     });
 
-    const recipients = assignedTo ? [parseInt(assignedTo)] : await getProjectMemberIds(req.params.id);
+    const recipients = await getProjectMemberIds(req.params.id);
+    if (assignedTo && !recipients.includes(parseInt(assignedTo))) {
+      recipients.push(parseInt(assignedTo));
+    }
     sendProjectNotification(req.app, req.params.id, recipients, {
       senderId: req.user.id,
       title: isFolder ? 'New Project Phase Created' : (assignedTo ? 'New Task Assigned to You' : 'New Task Created'),
@@ -530,7 +542,9 @@ router.post('/:id/tasks/:taskId/comments', protect, async (req, res) => {
 
     const task = await ProjectTask.findByPk(req.params.taskId);
     if (task) {
-      const rec = [task.assignedTo, task.createdBy];
+      const rec = await getProjectMemberIds(req.params.id);
+      if (task.assignedTo && !rec.includes(task.assignedTo)) rec.push(task.assignedTo);
+      if (task.createdBy && !rec.includes(task.createdBy)) rec.push(task.createdBy);
       sendProjectNotification(req.app, req.params.id, rec, {
         senderId: req.user.id,
         title: `Task Discussion: "${task.title}"`,
@@ -659,7 +673,10 @@ router.post('/:id/tasks/:taskId/files', protect, uploadFile.single('file'), asyn
       message: `📎 Uploaded attachment: ${req.file.originalname}`
     });
 
-    sendProjectNotification(req.app, req.params.id, [task.assignedTo, task.createdBy], {
+    const rec = await getProjectMemberIds(req.params.id);
+    if (task.assignedTo && !rec.includes(task.assignedTo)) rec.push(task.assignedTo);
+    if (task.createdBy && !rec.includes(task.createdBy)) rec.push(task.createdBy);
+    sendProjectNotification(req.app, req.params.id, rec, {
       senderId: req.user.id,
       title: `File Attached to "${task.title}"`,
       message: `${req.user.fullName} uploaded: ${req.file.originalname}`,
@@ -925,6 +942,16 @@ router.post('/:id/files', protect, uploadFile.single('file'), async (req, res) =
       detail: `File "${req.file.originalname}" uploaded`,
       refType: 'file',
       refId: file.id
+    });
+
+    const memberIds = await getProjectMemberIds(req.params.id);
+    const proj = await Project.findByPk(req.params.id);
+    sendProjectNotification(req.app, req.params.id, memberIds, {
+      senderId: req.user.id,
+      title: `New File in ${proj ? proj.name : 'Project'}`,
+      message: `${req.user.fullName} uploaded: "${req.file.originalname}"`,
+      action: 'file_uploaded',
+      tab: 'files'
     });
 
     res.status(201).json(file);

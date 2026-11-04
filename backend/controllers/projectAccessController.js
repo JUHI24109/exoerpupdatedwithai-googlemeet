@@ -66,7 +66,25 @@ exports.grantProjectAccess = async (req, res) => {
       grantedBy: req.user.id,
       grantedAt: new Date()
     }, { returning: true });
-    // Ensure creator remains Project Admin (prevent removal later)
+
+    const { notifyUser } = require('../utils/notifier');
+    await notifyUser(req.app, userId, {
+      title: `Access Granted to ${project.name}`,
+      message: `You were granted "${role}" access by ${req.user.fullName}`,
+      type: 'PROJECT',
+      relatedId: String(projectId)
+    });
+
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('project_update', {
+        projectId: String(projectId),
+        action: 'member_added',
+        title: `Access Granted`,
+        message: `${targetUser.fullName} joined ${project.name}`
+      });
+    }
+
     res.json({ success: true, created, member });
   } catch (err) {
     console.error(err);
