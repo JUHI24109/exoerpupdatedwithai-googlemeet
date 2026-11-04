@@ -153,13 +153,13 @@ app.set('io', io);
             await sequelize.sync();
             await sequelize.query('PRAGMA foreign_keys = ON;');
         } else if (dialect === 'mysql') {
-            // MySQL: sync tables (DO NOT drop Messages — preserves chat history)
+            // MySQL: sync tables (preserves all data, no duplicate index buildup)
             await sequelize.query('SET FOREIGN_KEY_CHECKS = 0;');
-            await sequelize.sync({ alter: true });
+            await sequelize.sync();
             await sequelize.query('SET FOREIGN_KEY_CHECKS = 1;');
         } else {
             // PostgreSQL: sync tables (preserves all data)
-            await sequelize.sync({ alter: true });
+            await sequelize.sync();
         }
         console.log('📦 Database Cleaned & Synced (Secure Mode) — Dialect:', dialect);
 
