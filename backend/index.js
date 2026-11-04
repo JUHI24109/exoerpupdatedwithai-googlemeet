@@ -111,6 +111,7 @@ const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 
 const app = express();
+app.set('trust proxy', 1); // Enable proxy trust for Cloudways / Nginx
 
 // ── Security & Performance Middleware ──
 app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false })); // Security headers
@@ -124,6 +125,7 @@ const apiLimiter = rateLimit({
     max: 200,
     standardHeaders: true,
     legacyHeaders: false,
+    validate: { xForwardedForHeader: false },
     message: { error: 'Too many requests. Please slow down.' }
 });
 app.use('/api/', apiLimiter);
