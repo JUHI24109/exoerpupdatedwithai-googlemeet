@@ -6,7 +6,7 @@
 (function() {
     if (!document.querySelector('script[src*="sidebar.js"]')) {
         const s = document.createElement('script');
-        s.src = 'js/sidebar.js';
+        s.src = '/js/sidebar.js';
         document.body.appendChild(s);
     }
 })();
