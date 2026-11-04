@@ -782,7 +782,7 @@
         if (!document.querySelector('link[rel="manifest"]')) {
             const manifestLink = document.createElement('link');
             manifestLink.rel = 'manifest';
-            manifestLink.href = '/manifest.json';
+            manifestLink.href = 'manifest.json';
             document.head.appendChild(manifestLink);
         }
 
@@ -806,7 +806,7 @@
         if (!document.querySelector('link[rel="apple-touch-icon"]')) {
             const iconLink = document.createElement('link');
             iconLink.rel = 'apple-touch-icon';
-            iconLink.href = '/exologo.png';
+            iconLink.href = 'exologo.png';
             document.head.appendChild(iconLink);
         }
 
@@ -814,17 +814,94 @@
         if (!document.querySelector('link[href*="responsive-universal.css"]')) {
             const cssLink = document.createElement('link');
             cssLink.rel = 'stylesheet';
-            cssLink.href = '/css/responsive-universal.css';
+            cssLink.href = 'css/responsive-universal.css';
             document.head.appendChild(cssLink);
         }
 
-        // PWA Install Script
-        if (!document.querySelector('script[src*="pwa-install.js"]')) {
-            const pwaScript = document.createElement('script');
-            pwaScript.src = '/js/pwa-install.js';
-            pwaScript.defer = true;
-            document.head.appendChild(pwaScript);
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(() => {});
         }
+    }
+
+    // Direct PWA Install Handler bundled into sidebar
+    let deferredPwaPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPwaPrompt = e;
+    });
+
+    window.installExoApp = async function () {
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        if (isStandalone) {
+            alert('EXO ERP is already running as an installed application.');
+            return;
+        }
+
+        if (deferredPwaPrompt) {
+            try {
+                deferredPwaPrompt.prompt();
+                await deferredPwaPrompt.userChoice;
+                deferredPwaPrompt = null;
+                return;
+            } catch(e) {}
+        }
+
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        showPwaModal(isIOS ? 'ios' : 'generic');
+    };
+
+    function showPwaModal(type) {
+        if (document.getElementById('exo-pwa-guide-modal')) return;
+        const modal = document.createElement('div');
+        modal.id = 'exo-pwa-guide-modal';
+        modal.style.cssText = 'position:fixed;inset:0;z-index:99999999;background:rgba(15,23,42,0.85);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;';
+        
+        const isIOS = type === 'ios';
+        const stepsHtml = isIOS ? `
+            <div style="display:flex;flex-direction:column;gap:12px;text-align:left;font-size:13px;color:#e2e8f0;margin-bottom:20px;">
+                <div style="display:flex;align-items:center;gap:12px;background:#0f172a;padding:12px;border-radius:12px;">
+                    <span style="background:#0ea5e9;color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;">1</span>
+                    <span>Tap the <strong>Share</strong> button <i class="fa-solid fa-arrow-up-from-bracket" style="color:#0ea5e9;margin-left:4px;"></i> at bottom of Safari.</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;background:#0f172a;padding:12px;border-radius:12px;">
+                    <span style="background:#0ea5e9;color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;">2</span>
+                    <span>Scroll down and select <strong>"Add to Home Screen"</strong> <i class="fa-regular fa-square-plus" style="color:#0ea5e9;margin-left:4px;"></i>.</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;background:#0f172a;padding:12px;border-radius:12px;">
+                    <span style="background:#0ea5e9;color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;">3</span>
+                    <span>Tap <strong>Add</strong> at top right to install EXO ERP app!</span>
+                </div>
+            </div>
+        ` : `
+            <div style="display:flex;flex-direction:column;gap:12px;text-align:left;font-size:13px;color:#e2e8f0;margin-bottom:20px;">
+                <div style="display:flex;align-items:center;gap:12px;background:#0f172a;padding:12px;border-radius:12px;">
+                    <span style="background:#0ea5e9;color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;">1</span>
+                    <span>Tap browser menu <strong>(⋮ or ⋯)</strong> at the top right.</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;background:#0f172a;padding:12px;border-radius:12px;">
+                    <span style="background:#0ea5e9;color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;">2</span>
+                    <span>Select <strong>"Install app"</strong> or <strong>"Add to Home screen"</strong>.</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;background:#0f172a;padding:12px;border-radius:12px;">
+                    <span style="background:#0ea5e9;color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;">3</span>
+                    <span>Confirm <strong>Install</strong> to add EXO ERP to your device!</span>
+                </div>
+            </div>
+        `;
+
+        modal.innerHTML = `
+            <div style="background:#1e293b;border:1px solid rgba(255,255,255,0.15);border-radius:20px;max-width:380px;width:100%;padding:24px;text-align:center;color:white;position:relative;box-shadow:0 20px 40px rgba(0,0,0,0.6);">
+                <button onclick="document.getElementById('exo-pwa-guide-modal').remove()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:#94a3b8;font-size:22px;cursor:pointer;">&times;</button>
+                <img src="exologo.png" style="width:64px;height:64px;border-radius:12px;margin-bottom:12px;object-fit:contain;filter:brightness(0) invert(1);" />
+                <h3 style="font-size:18px;font-weight:800;margin-bottom:8px;">Install EXO ERP App</h3>
+                <p style="font-size:13px;color:#94a3b8;margin-bottom:18px;">Install on your mobile home screen in 3 quick steps:</p>
+                ${stepsHtml}
+                <button onclick="document.getElementById('exo-pwa-guide-modal').remove()" style="width:100%;padding:12px;border-radius:10px;background:linear-gradient(135deg, #0ea5e9, #6366f1);color:#fff;font-weight:700;border:none;cursor:pointer;">Got it</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
     }
 
     // Mobile Sidebar Drawer Toggle & Backdrop
