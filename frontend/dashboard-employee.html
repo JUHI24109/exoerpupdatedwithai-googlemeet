@@ -104,10 +104,10 @@
             <div class="kpi-card"><div class="kpi-header"><span class="kpi-title">Pending</span><i class="fa-solid fa-hourglass-half" style="color:var(--warning)"></i></div><span class="kpi-val" style="color:var(--warning)" id="kpiPend">0</span></div>
             <div class="kpi-card"><div class="kpi-header"><span class="kpi-title">Attendance</span><i class="fa-solid fa-calendar-check" style="color:var(--primary)"></i></div><span class="kpi-val" id="kpiAtt">100%</span></div>
         </div>
-        <div style="display:flex;gap:12px;flex-shrink:0">
-            <button onclick="clockIn()" class="btn-action" style="background:var(--success);color:white"><i class="fa-solid fa-arrow-right-to-bracket"></i> Clock In</button>
-            <button onclick="clockOut()" class="btn-action" style="background:var(--danger);color:white"><i class="fa-solid fa-arrow-right-from-bracket"></i> Clock Out</button>
-            <button onclick="showLeaveModal()" class="btn-action" style="background:var(--accent);color:white"><i class="fa-solid fa-calendar-minus"></i> Apply Leave</button>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin:12px 0;align-items:center;">
+            <button onclick="clockIn()" class="btn-action" style="background:var(--success);color:white;font-weight:700;"><i class="fa-solid fa-arrow-right-to-bracket"></i> Clock In</button>
+            <button onclick="clockOut()" class="btn-action" style="background:var(--danger);color:white;font-weight:700;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Clock Out</button>
+            <button onclick="showLeaveModal()" class="btn-action" style="background:linear-gradient(135deg, #0ea5e9, #6366f1);color:white;font-weight:700;box-shadow:0 4px 12px rgba(14,165,233,0.3);"><i class="fa-solid fa-calendar-minus"></i> Apply Leave</button>
         </div>
         <div class="bento-grid">
 

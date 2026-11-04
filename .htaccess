@@ -1,6 +1,10 @@
 <IfModule mod_rewrite.c>
 RewriteEngine On
 
+# PWA Manifest & Service Worker routing
+RewriteRule ^manifest\.json$ frontend/manifest.json [L]
+RewriteRule ^sw\.js$ frontend/sw.js [L]
+
 # Route all /api/ requests to our PHP proxy
 RewriteRule ^api/(.*)$ api.php [L,QSA]
 

@@ -846,12 +846,14 @@
         document.getElementById('lobbyAvatar').textContent = myInitial;
         document.getElementById('localAvatar').textContent = myInitial;
 
-        // WebRTC Config (Public Google STUN)
+        // WebRTC Config (Public Google, Cloudflare & Twilio STUN)
         const rtcConfig = {
             iceServers: [
                 { urls: 'stun:stun.l.google.com:19302' },
                 { urls: 'stun:stun1.l.google.com:19302' },
-                { urls: 'stun:stun2.l.google.com:19302' }
+                { urls: 'stun:stun2.l.google.com:19302' },
+                { urls: 'stun:stun.cloudflare.com:3478' },
+                { urls: 'stun:global.stun.twilio.com:3478' }
             ]
         };
 
@@ -1001,6 +1003,7 @@
         socket.on('meeting_existing_users', async ({ existingUsers }) => {
             console.log('👥 Existing peers in room:', existingUsers);
             for (const peer of existingUsers) {
+                ensurePeerTile(peer.socketId, peer.userName);
                 await createPeerConnectionAndOffer(peer.socketId, peer.userName);
             }
             updateParticipantCount();
@@ -1009,6 +1012,7 @@
         // 2. When a new peer joins after us
         socket.on('user_joined_meeting', ({ socketId, userName }) => {
             console.log('👤 New peer joined room:', userName, socketId);
+            ensurePeerTile(socketId, userName);
             showToast(`${userName || 'A colleague'} joined the call`);
             updateParticipantCount();
         });
@@ -1017,8 +1021,19 @@
         socket.on('meeting_offer', async ({ sdp, senderSocketId, senderName }) => {
             console.log('📩 Received offer from:', senderSocketId);
             try {
+                ensurePeerTile(senderSocketId, senderName);
                 const pc = getOrCreatePeerConnection(senderSocketId, senderName);
                 await pc.setRemoteDescription(new RTCSessionDescription(sdp));
+                
+                // Flush queued ICE candidates
+                const peerObj = peerConnections[senderSocketId];
+                if (peerObj && peerObj.candidateQueue) {
+                    for (const cand of peerObj.candidateQueue) {
+                        try { await pc.addIceCandidate(new RTCIceCandidate(cand)); } catch(e){}
+                    }
+                    peerObj.candidateQueue = [];
+                }
+
                 const answer = await pc.createAnswer();
                 await pc.setLocalDescription(answer);
 
@@ -1038,6 +1053,14 @@
             if (peer && peer.pc) {
                 try {
                     await peer.pc.setRemoteDescription(new RTCSessionDescription(sdp));
+                    
+                    // Flush queued ICE candidates
+                    if (peer.candidateQueue) {
+                        for (const cand of peer.candidateQueue) {
+                            try { await peer.pc.addIceCandidate(new RTCIceCandidate(cand)); } catch(e){}
+                        }
+                        peer.candidateQueue = [];
+                    }
                 } catch (err) {
                     console.error('Error setting remote answer:', err);
                 }
@@ -1047,11 +1070,16 @@
         // 5. Receive ICE Candidate from peer
         socket.on('meeting_ice_candidate', async ({ candidate, senderSocketId }) => {
             const peer = peerConnections[senderSocketId];
-            if (peer && peer.pc && candidate) {
-                try {
-                    await peer.pc.addIceCandidate(new RTCIceCandidate(candidate));
-                } catch (err) {
-                    console.error('Error adding ICE candidate:', err);
+            if (peer && candidate) {
+                if (peer.pc && peer.pc.remoteDescription) {
+                    try {
+                        await peer.pc.addIceCandidate(new RTCIceCandidate(candidate));
+                    } catch (err) {
+                        console.error('Error adding ICE candidate:', err);
+                    }
+                } else {
+                    if (!peer.candidateQueue) peer.candidateQueue = [];
+                    peer.candidateQueue.push(candidate);
                 }
             }
         });
@@ -1077,7 +1105,7 @@
         // ── WebRTC Connection Helpers ──
 
         function getOrCreatePeerConnection(targetSocketId, peerName = 'Colleague') {
-            if (peerConnections[targetSocketId]) {
+            if (peerConnections[targetSocketId] && peerConnections[targetSocketId].pc) {
                 return peerConnections[targetSocketId].pc;
             }
 
@@ -1115,7 +1143,7 @@
                 }
             };
 
-            peerConnections[targetSocketId] = { pc, userName: peerName };
+            peerConnections[targetSocketId] = { pc, userName: peerName, candidateQueue: [] };
             return pc;
         }
 
@@ -1134,35 +1162,53 @@
             }
         }
 
-        function attachRemoteVideo(socketId, stream, peerName) {
+        function ensurePeerTile(socketId, peerName) {
             let tile = document.getElementById(`tile-${socketId}`);
             if (!tile) {
                 tile = document.createElement('div');
                 tile.className = 'video-tile';
                 tile.id = `tile-${socketId}`;
 
+                const initial = (peerName || 'C').charAt(0).toUpperCase();
+                const avatar = document.createElement('div');
+                avatar.className = 'video-tile-avatar';
+                avatar.id = `avatar-${socketId}`;
+                avatar.style.cssText = 'width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#0f172a;';
+                avatar.innerHTML = `<div style="width:72px;height:72px;border-radius:50%;background:#0284c7;color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;box-shadow:0 4px 15px rgba(0,0,0,0.3);">${initial}</div>`;
+
                 const video = document.createElement('video');
                 video.id = `video-${socketId}`;
                 video.autoplay = true;
                 video.playsInline = true;
-                video.srcObject = stream;
+                video.style.display = 'none';
 
                 const nameTag = document.createElement('div');
                 nameTag.className = 'video-tile-name';
                 nameTag.innerHTML = `
-                    <span>${peerName || 'Participant'}</span>
+                    <span>${peerName || 'Colleague'}</span>
                     <i class="fa-solid fa-microphone status-mic"></i>
                 `;
 
+                tile.appendChild(avatar);
                 tile.appendChild(video);
                 tile.appendChild(nameTag);
                 document.getElementById('videoGrid').appendChild(tile);
 
                 updateGridClass();
                 updateParticipantCount();
-            } else {
-                const video = tile.querySelector('video');
-                if (video) video.srcObject = stream;
+            }
+            return tile;
+        }
+
+        function attachRemoteVideo(socketId, stream, peerName) {
+            const tile = ensurePeerTile(socketId, peerName);
+            const video = tile.querySelector('video');
+            const avatar = tile.querySelector('.video-tile-avatar');
+            if (video && stream) {
+                video.srcObject = stream;
+                video.style.display = 'block';
+                video.play().catch(() => {});
+                if (avatar) avatar.style.display = 'none';
             }
         }
 

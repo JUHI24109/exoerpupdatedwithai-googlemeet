@@ -211,7 +211,48 @@
     }
 
     function showGenericInstallModal() {
-        showPwaToast('To install: click the Install icon (computer screen with arrow) in your browser address bar.');
+        if (document.getElementById('exo-generic-install-modal')) return;
+        const modal = document.createElement('div');
+        modal.id = 'exo-generic-install-modal';
+        modal.style.cssText = `
+            position: fixed; inset: 0; z-index: 9999999;
+            background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center; padding: 20px;
+        `;
+        modal.innerHTML = `
+            <div style="
+                background: #1e293b; border: 1px solid rgba(255,255,255,0.15);
+                border-radius: 20px; max-width: 380px; width: 100%; padding: 24px;
+                text-align: center; color: white; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            ">
+                <button onclick="document.getElementById('exo-generic-install-modal').remove()" style="
+                    position: absolute; top: 16px; right: 16px; background: none;
+                    border: none; color: #94a3b8; font-size: 20px; cursor: pointer;
+                ">&times;</button>
+                <img src="exologo.png?v=2" style="width: 64px; height: 64px; border-radius: 12px; margin-bottom: 12px; object-fit:contain; filter: brightness(0) invert(1);" />
+                <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 8px;">Install EXO ERP App</h3>
+                <p style="font-size: 13px; color: #94a3b8; margin-bottom: 18px;">To install on your phone or desktop:</p>
+                <div style="display:flex; flex-direction:column; gap:12px; text-align:left; font-size:13px; color:#e2e8f0; margin-bottom:20px;">
+                    <div style="display:flex; align-items:center; gap:12px; background:#0f172a; padding:12px; border-radius:12px;">
+                        <span style="background:#0ea5e9; color:#fff; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px;">1</span>
+                        <span>Tap browser menu <strong>(⋮ or ⋯)</strong> at the top right.</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:12px; background:#0f172a; padding:12px; border-radius:12px;">
+                        <span style="background:#0ea5e9; color:#fff; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px;">2</span>
+                        <span>Tap <strong>"Install app"</strong> or <strong>"Add to Home screen"</strong>.</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:12px; background:#0f172a; padding:12px; border-radius:12px;">
+                        <span style="background:#0ea5e9; color:#fff; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px;">3</span>
+                        <span>Confirm <strong>Install</strong> to launch like a native application!</span>
+                    </div>
+                </div>
+                <button onclick="document.getElementById('exo-generic-install-modal').remove()" style="
+                    width: 100%; padding: 12px; border-radius: 10px;
+                    background: linear-gradient(135deg, #0ea5e9, #6366f1); color: #fff; font-weight: 700; border: none; cursor: pointer;
+                ">Got it</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
     }
 
     function showPwaToast(msg) {

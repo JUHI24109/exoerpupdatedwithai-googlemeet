@@ -150,13 +150,6 @@
             href: 'undertakings.html',
             isActive: currentPage === 'undertakings.html'
         });
-        navItems.push({
-            id: 'nav-profile-mapping',
-            label: 'Profile Mapping',
-            icon: 'fa-solid fa-id-card-clip',
-            href: 'profile-mapping.html',
-            isActive: currentPage === 'profile-mapping.html'
-        });
     }
 
     // Badge HTML generator
