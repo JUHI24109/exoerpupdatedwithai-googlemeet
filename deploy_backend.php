@@ -9,25 +9,16 @@ $envFile = $dir . '/backend/.env';
 $envExample = $dir . '/backend/.env.example';
 
 if (!file_exists($envFile)) {
-    echo "<span style='color:red; font-size:16px;'><b>⚠️ WARNING: No .env file found in backend/</b></span>\n";
-    echo "You MUST create backend/.env with your Cloudways database credentials.\n\n";
-    echo "<b>Quick Setup:</b>\n";
-    echo "1. Go to Cloudways → Application Settings → Access Details\n";
-    echo "2. Copy: DB Name, DB Username, DB Password\n";
-    echo "3. Create backend/.env with these values:\n\n";
-    echo "   PORT=5000\n";
-    echo "   JWT_SECRET=exo-erp-secret-key-change-this\n";
-    echo "   DB_HOST=localhost\n";
-    echo "   DB_PORT=3306\n";
-    echo "   DB_DATABASE=your_db_name\n";
-    echo "   DB_USERNAME=your_db_user\n";
-    echo "   DB_PASSWORD=your_db_pass\n";
-    echo "   DB_DIALECT=mysql\n\n";
-    echo "Or copy from .env.example:\n";
-    echo "   cp backend/.env.example backend/.env\n";
-    echo "   Then edit backend/.env with your actual values.\n\n";
-    echo "</pre>";
-    exit;
+    $defaultEnv = "PORT=5000\n" .
+                  "JWT_SECRET=exo-erp-production-secret-auth-key-2026\n" .
+                  "DB_HOST=localhost\n" .
+                  "DB_PORT=3306\n" .
+                  "DB_DATABASE=zeytnndnay\n" .
+                  "DB_USERNAME=zeytnndnay\n" .
+                  "DB_PASSWORD=p2PVXxHY3y\n" .
+                  "DB_DIALECT=mysql\n";
+    file_put_contents($envFile, $defaultEnv);
+    echo "<span style='color:green;'><b>✅ Auto-created backend/.env with Cloudways MySQL credentials!</b></span>\n\n";
 }
 
 $script = <<<EOT
