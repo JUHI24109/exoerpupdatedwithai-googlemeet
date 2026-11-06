@@ -1,0 +1,31 @@
+name: Deploy to Cloudways
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to Production Server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: 22
+          script: |
+            cd /home/1253680.cloudwaysapps.com/zeytnndnay/public_html
+            git fetch https://${{ secrets.GH_TOKEN }}@github.com/JUHI24109/exoerpupdatedwithai-googlemeet.git main
+            git reset --hard FETCH_HEAD
+            cd backend
+            pkill -f "node index.js" 2>/dev/null || true
+            sleep 2
+            nohup node index.js > ./backend_log.txt 2>&1 &
+            sleep 3
+            echo "Deploy complete!"
+            cat ./backend_log.txt

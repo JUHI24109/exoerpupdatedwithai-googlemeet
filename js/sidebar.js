@@ -104,6 +104,40 @@
         }
     ];
 
+    // ── Executive/HR-only items: Leave Requests, Holidays, Undertakings, Profile Mapping ──
+    if (isExecutiveOrHR) {
+        navItems.push(
+            {
+                id: 'nav-leaves',
+                label: 'Leave Requests',
+                icon: 'fa-solid fa-calendar-xmark',
+                href: 'dashboard.html?tab=leaves',
+                isActive: currentPage === 'dashboard.html' && activeTab === 'leaves'
+            },
+            {
+                id: 'nav-holidays',
+                label: 'Holidays',
+                icon: 'fa-solid fa-umbrella-beach',
+                href: 'dashboard.html?tab=holidays',
+                isActive: currentPage === 'dashboard.html' && activeTab === 'holidays'
+            },
+            {
+                id: 'nav-undertakings',
+                label: 'Undertakings',
+                icon: 'fa-solid fa-file-signature',
+                href: 'undertakings.html',
+                isActive: currentPage === 'undertakings.html'
+            },
+            {
+                id: 'nav-profile-mapping',
+                label: 'Profile Mapping',
+                icon: 'fa-solid fa-sitemap',
+                href: 'profile-mapping.html',
+                isActive: currentPage === 'profile-mapping.html'
+            }
+        );
+    }
+
     // Employees tab – visible ONLY to Executive & HR roles (Chairman, CEO, IT Admin, HR)
     // Regular employees must NOT have access to all employees directory
     if (isExecutiveOrHR) {

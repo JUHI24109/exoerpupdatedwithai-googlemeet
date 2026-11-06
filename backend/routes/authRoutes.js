@@ -240,7 +240,7 @@ router.post('/password-reset/complete', verifyReset, async (req, res) => {
 
 
 // ── Admin: Update Any User ──
-router.put('/user/:employeeId', protect, restrictTo('IT Admin'), async (req, res) => {
+router.put('/user/:employeeId', protect, restrictTo('IT Admin', 'Chairman', 'CEO', 'HR', 'HR Manager'), async (req, res) => {
   try {
     const fields = [
       'fullName', 'email', 'phone', 'whatsappNumber', 'role', 'department',
@@ -255,7 +255,7 @@ router.put('/user/:employeeId', protect, restrictTo('IT Admin'), async (req, res
 });
 
 // ── Admin: Delete User ──
-router.delete('/user/:employeeId', protect, restrictTo('IT Admin'), async (req, res) => {
+router.delete('/user/:employeeId', protect, restrictTo('IT Admin', 'Chairman', 'CEO'), async (req, res) => {
   try {
     await User.destroy({ where: { employeeId: req.params.employeeId } });
     res.json({ message: 'User deleted successfully' });
