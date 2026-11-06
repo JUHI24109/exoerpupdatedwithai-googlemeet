@@ -7,6 +7,13 @@ RewriteRule ^sw\.js$ frontend/sw.js [L]
 RewriteRule ^icon-192\.png$ frontend/icon-192.png [L]
 RewriteRule ^icon-512\.png$ frontend/icon-512.png [L]
 
+# Direct meeting links support
+RewriteRule ^meeting\.html$ frontend/meeting.html [L]
+
+# Route JS & CSS to frontend assets
+RewriteRule ^js/(.*)$ frontend/js/$1 [L]
+RewriteRule ^css/(.*)$ frontend/css/$1 [L]
+
 # Route all /api/ requests to our PHP proxy
 RewriteRule ^api/(.*)$ api.php [L,QSA]
 

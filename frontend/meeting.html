@@ -745,16 +745,25 @@
         <div class="active-meeting-view" id="meetingView" style="display: none;">
             <!-- Top Bar -->
             <div class="meet-top-bar">
-                <div class="meet-title-group">
-                    <div class="meet-code-badge" onclick="copyMeetingLink()" title="Click to copy meeting link">
-                        <i class="fa-solid fa-link"></i>
+                <div class="meet-title-group" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                    <button class="meet-code-badge" onclick="copyMeetingLink()" title="Click to copy full meeting link" style="border:none;cursor:pointer;">
+                        <i class="fa-solid fa-link" style="color:var(--meet-accent);"></i>
+                        <span>Copy Link</span>
+                        <i class="fa-regular fa-copy" style="font-size:11px;margin-left:2px;"></i>
+                    </button>
+                    <button class="meet-code-badge" onclick="copyMeetingCode()" title="Click to copy meeting code" style="border:none;cursor:pointer;color:#10b981;">
+                        <i class="fa-solid fa-hashtag"></i>
                         <span id="roomCodeDisplay">exo-room</span>
-                        <i class="fa-regular fa-copy" style="font-size:12px; margin-left:4px;"></i>
-                    </div>
+                        <i class="fa-regular fa-copy" style="font-size:11px;margin-left:2px;"></i>
+                    </button>
                     <div class="meet-timer" id="callDuration">00:00</div>
                 </div>
 
-                <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <button class="meet-code-badge" onclick="openChatWithoutLeaving()" style="background:linear-gradient(135deg, #0284c7, #2563eb);color:#fff;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(37,99,235,0.3);" title="Open Team Chat in a new tab without leaving the meeting">
+                        <i class="fa-solid fa-comments"></i>
+                        <span>Open Chat (New Tab)</span>
+                    </button>
                     <div class="meet-code-badge" style="cursor:default;" id="participantCountBadge">
                         <i class="fa-solid fa-users"></i> 1 in meeting
                     </div>
@@ -1511,17 +1520,70 @@
             }, 1000);
         }
 
-        // ── Copy Link & Toasts ──
+        // ── Bulletproof Copy & Toasts ──
+        function copyText(text, successMsg) {
+            if (!text) return;
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast(successMsg || 'Copied to clipboard!');
+                }).catch(() => {
+                    fallbackCopy(text, successMsg);
+                });
+            } else {
+                fallbackCopy(text, successMsg);
+            }
+        }
+
+        function fallbackCopy(text, successMsg) {
+            try {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'fixed';
+                ta.style.top = '-9999px';
+                ta.style.left = '-9999px';
+                ta.setAttribute('readonly', '');
+                document.body.appendChild(ta);
+                ta.select();
+                ta.setSelectionRange(0, 99999);
+                const successful = document.execCommand('copy');
+                document.body.removeChild(ta);
+                if (successful) {
+                    showToast(successMsg || 'Copied to clipboard!');
+                } else {
+                    prompt('Copy manually:', text);
+                }
+            } catch (err) {
+                prompt('Copy manually:', text);
+            }
+        }
+
         function copyMeetingLink() {
             if (!activeRoomId) return;
-            const url = `${window.location.origin}/meeting.html?room=${activeRoomId}`;
-            navigator.clipboard.writeText(url).then(() => {
-                showToast('Meeting link copied to clipboard!');
-            }).catch(() => {
-                navigator.clipboard.writeText(activeRoomId);
-                showToast(`Meeting code copied: ${activeRoomId}`);
-            });
+            const fullUrl = `${window.location.origin}${window.location.pathname}?room=${activeRoomId}`;
+            copyText(fullUrl, '✅ Meeting link copied! Ready to paste into Chat.');
         }
+
+        function copyMeetingCode() {
+            if (!activeRoomId) return;
+            copyText(activeRoomId, `✅ Meeting Code (${activeRoomId}) copied!`);
+        }
+
+        function openChatWithoutLeaving() {
+            if (activeRoomId) {
+                const fullUrl = `${window.location.origin}${window.location.pathname}?room=${activeRoomId}`;
+                copyText(fullUrl, '✅ Link copied! Opening Chat in new tab...');
+            }
+            window.open('chat.html', '_blank', 'noopener');
+        }
+
+        // Prevent meeting from closing when user accidentally navigates away
+        window.addEventListener('beforeunload', (e) => {
+            if (activeRoomId && document.getElementById('meetingView').style.display !== 'none') {
+                e.preventDefault();
+                e.returnValue = 'You are currently in an active Live Meeting. Leaving will end your call.';
+                return e.returnValue;
+            }
+        });
 
         function showToast(text) {
             const existing = document.querySelector('.meet-toast');
@@ -1536,7 +1598,7 @@
                 toast.style.opacity = '0';
                 toast.style.transition = 'opacity 0.3s ease';
                 setTimeout(() => toast.remove(), 300);
-            }, 3000);
+            }, 3200);
         }
 
         // ── Auto-join if URL has ?room= parameter ──

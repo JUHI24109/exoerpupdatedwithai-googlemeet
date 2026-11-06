@@ -52,13 +52,6 @@
             onClick: currentPage === 'dashboard.html' ? "switchDashSection('main')" : null
         },
         {
-            id: 'nav-employees',
-            label: 'Employees',
-            icon: 'fa-solid fa-users',
-            href: 'employees.html',
-            isActive: currentPage === 'employees.html'
-        },
-        {
             id: 'nav-attendance',
             label: 'Attendance',
             icon: 'fa-solid fa-user-check',
@@ -111,11 +104,24 @@
         }
     ];
 
+    // Employees tab – visible ONLY to Executive & HR roles (Chairman, CEO, IT Admin, HR)
+    // Regular employees must NOT have access to all employees directory
+    if (isExecutiveOrHR) {
+        navItems.splice(1, 0, {
+            id: 'nav-employees',
+            label: 'Employees',
+            icon: 'fa-solid fa-users',
+            href: 'employees.html',
+            isActive: currentPage === 'employees.html'
+        });
+    }
+
     // Projects tab – visible to Chairman, CEO, IT Admin always;
     // also visible to any other role that has at least one project membership (checked async below)
     const isProjectsEligible = ['Chairman', 'CEO', 'IT Admin'].includes(role);
     if (isProjectsEligible) {
-        navItems.splice(4, 0, {
+        const projectInsertIndex = isExecutiveOrHR ? 4 : 3;
+        navItems.splice(projectInsertIndex, 0, {
             id: 'nav-projects',
             label: 'Projects',
             icon: 'fa-solid fa-building-columns',
@@ -124,8 +130,6 @@
             badgeId: 'sidebar-projects-badge'
         });
     }
-
-
 
     // Badge HTML generator
     function makeBadge(badgeId) {
@@ -138,8 +142,10 @@
         const activeClass = item.isActive ? ' active' : '';
         const clickAttr = item.onClick ? ` onclick="${item.onClick}; return false;"` : '';
         const badgeSlot = makeBadge(item.badgeId);
+        // If inside Live Meeting, open Chat in new tab so call doesn't terminate
+        const targetAttr = (currentPage === 'meeting.html' && item.id === 'nav-chat') ? ' target="_blank" rel="noopener"' : '';
         return `
-            <a href="${item.href}" class="nav-link${activeClass}" id="${item.id}"${clickAttr}>
+            <a href="${item.href}" class="nav-link${activeClass}" id="${item.id}"${clickAttr}${targetAttr}>
                 <i class="${item.icon}"></i>
                 <span>${item.label}</span>
                 ${badgeSlot}

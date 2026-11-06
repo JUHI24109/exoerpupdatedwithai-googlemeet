@@ -52,13 +52,6 @@
             onClick: currentPage === 'dashboard.html' ? "switchDashSection('main')" : null
         },
         {
-            id: 'nav-employees',
-            label: 'Employees',
-            icon: 'fa-solid fa-users',
-            href: 'employees.html',
-            isActive: currentPage === 'employees.html'
-        },
-        {
             id: 'nav-attendance',
             label: 'Attendance',
             icon: 'fa-solid fa-user-check',
@@ -111,51 +104,30 @@
         }
     ];
 
+    // Employees tab – visible ONLY to Executive & HR roles (Chairman, CEO, IT Admin, HR)
+    // Regular employees must NOT have access to all employees directory
+    if (isExecutiveOrHR) {
+        navItems.splice(1, 0, {
+            id: 'nav-employees',
+            label: 'Employees',
+            icon: 'fa-solid fa-users',
+            href: 'employees.html',
+            isActive: currentPage === 'employees.html'
+        });
+    }
+
     // Projects tab – visible to Chairman, CEO, IT Admin always;
     // also visible to any other role that has at least one project membership (checked async below)
     const isProjectsEligible = ['Chairman', 'CEO', 'IT Admin'].includes(role);
     if (isProjectsEligible) {
-        navItems.splice(4, 0, {
+        const projectInsertIndex = isExecutiveOrHR ? 4 : 3;
+        navItems.splice(projectInsertIndex, 0, {
             id: 'nav-projects',
             label: 'Projects',
             icon: 'fa-solid fa-building-columns',
             href: 'projects.html',
             isActive: currentPage === 'projects.html' || currentPage === 'project-workspace.html',
             badgeId: 'sidebar-projects-badge'
-        });
-    }
-
-    // Executive & HR specific management links
-    if (isExecutiveOrHR) {
-        navItems.push({
-            id: 'nav-leaves',
-            label: 'Leave Requests',
-            icon: 'fa-solid fa-calendar-minus',
-            href: 'dashboard.html?tab=leaves',
-            isActive: currentPage === 'dashboard.html' && activeTab === 'leaves',
-            onClick: currentPage === 'dashboard.html' ? "switchDashSection('leaves')" : null
-        });
-        navItems.push({
-            id: 'nav-holidays',
-            label: 'Holidays',
-            icon: 'fa-solid fa-umbrella-beach',
-            href: 'dashboard.html?tab=holidays',
-            isActive: currentPage === 'dashboard.html' && activeTab === 'holidays',
-            onClick: currentPage === 'dashboard.html' ? "switchDashSection('holidays')" : null
-        });
-        navItems.push({
-            id: 'nav-undertakings',
-            label: 'Undertakings',
-            icon: 'fa-solid fa-handshake',
-            href: 'undertakings.html',
-            isActive: currentPage === 'undertakings.html'
-        });
-        navItems.push({
-            id: 'nav-profile-mapping',
-            label: 'Profile Mapping',
-            icon: 'fa-solid fa-id-card-clip',
-            href: 'profile-mapping.html',
-            isActive: currentPage === 'profile-mapping.html'
         });
     }
 
@@ -170,8 +142,10 @@
         const activeClass = item.isActive ? ' active' : '';
         const clickAttr = item.onClick ? ` onclick="${item.onClick}; return false;"` : '';
         const badgeSlot = makeBadge(item.badgeId);
+        // If inside Live Meeting, open Chat in new tab so call doesn't terminate
+        const targetAttr = (currentPage === 'meeting.html' && item.id === 'nav-chat') ? ' target="_blank" rel="noopener"' : '';
         return `
-            <a href="${item.href}" class="nav-link${activeClass}" id="${item.id}"${clickAttr}>
+            <a href="${item.href}" class="nav-link${activeClass}" id="${item.id}"${clickAttr}${targetAttr}>
                 <i class="${item.icon}"></i>
                 <span>${item.label}</span>
                 ${badgeSlot}
@@ -814,7 +788,7 @@
         if (!document.querySelector('link[rel="manifest"]')) {
             const manifestLink = document.createElement('link');
             manifestLink.rel = 'manifest';
-            manifestLink.href = '/manifest.json';
+            manifestLink.href = 'manifest.json';
             document.head.appendChild(manifestLink);
         }
 
@@ -838,7 +812,7 @@
         if (!document.querySelector('link[rel="apple-touch-icon"]')) {
             const iconLink = document.createElement('link');
             iconLink.rel = 'apple-touch-icon';
-            iconLink.href = '/exologo.png';
+            iconLink.href = 'exologo.png';
             document.head.appendChild(iconLink);
         }
 
@@ -846,17 +820,103 @@
         if (!document.querySelector('link[href*="responsive-universal.css"]')) {
             const cssLink = document.createElement('link');
             cssLink.rel = 'stylesheet';
-            cssLink.href = '/css/responsive-universal.css';
+            cssLink.href = 'css/responsive-universal.css';
             document.head.appendChild(cssLink);
         }
 
-        // PWA Install Script
-        if (!document.querySelector('script[src*="pwa-install.js"]')) {
-            const pwaScript = document.createElement('script');
-            pwaScript.src = '/js/pwa-install.js';
-            pwaScript.defer = true;
-            document.head.appendChild(pwaScript);
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js', { scope: '/' })
+                .catch(() => navigator.serviceWorker.register('sw.js').catch(() => {}));
         }
+    }
+
+    // Direct PWA Install Handler bundled into sidebar
+    let deferredPwaPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPwaPrompt = e;
+        console.log('[EXO ERP] PWA install prompt ready');
+    });
+
+    window.installExoApp = async function () {
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        if (isStandalone) {
+            alert('EXO ERP is already installed and running as an app!');
+            return;
+        }
+
+        if (deferredPwaPrompt) {
+            try {
+                deferredPwaPrompt.prompt();
+                const choice = await deferredPwaPrompt.userChoice;
+                if (choice && choice.outcome === 'accepted') {
+                    deferredPwaPrompt = null;
+                    return;
+                }
+            } catch(e) {
+                console.warn('[EXO ERP] Prompt error:', e);
+            }
+        }
+
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        showPwaModal(isIOS ? 'ios' : 'android');
+    };
+
+    function showPwaModal(type) {
+        const existing = document.getElementById('exo-pwa-guide-modal');
+        if (existing) existing.remove();
+
+        const modal = document.createElement('div');
+        modal.id = 'exo-pwa-guide-modal';
+        modal.style.cssText = 'position:fixed;inset:0;z-index:99999999;background:rgba(15,23,42,0.88);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:16px;';
+        
+        const isIOS = type === 'ios';
+        const stepsHtml = isIOS ? `
+            <div style="display:flex;flex-direction:column;gap:10px;text-align:left;font-size:13px;color:#e2e8f0;margin-bottom:18px;">
+                <div style="display:flex;align-items:center;gap:12px;background:#0f172a;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);">
+                    <span style="background:#0ea5e9;color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;">1</span>
+                    <span>Safari ke bottom par <strong>Share</strong> icon <i class="fa-solid fa-arrow-up-from-bracket" style="color:#38bdf8;margin:0 4px;"></i> dabayein.</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;background:#0f172a;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);">
+                    <span style="background:#0ea5e9;color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;">2</span>
+                    <span>Neeche scroll karein aur <strong>"Add to Home Screen"</strong> <i class="fa-regular fa-square-plus" style="color:#38bdf8;margin:0 4px;"></i> select karein.</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;background:#0f172a;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);">
+                    <span style="background:#0ea5e9;color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;">3</span>
+                    <span>Upar right corner par <strong>Add</strong> dabayein — App install ho jayegi!</span>
+                </div>
+            </div>
+        ` : `
+            <div style="display:flex;flex-direction:column;gap:10px;text-align:left;font-size:13px;color:#e2e8f0;margin-bottom:18px;">
+                <div style="display:flex;align-items:center;gap:12px;background:#0f172a;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);">
+                    <span style="background:#0ea5e9;color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;">1</span>
+                    <span>Chrome / Browser ke upar <strong>3 dots (⋮ or ⋯)</strong> menu dabayein.</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;background:#0f172a;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);">
+                    <span style="background:#0ea5e9;color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;">2</span>
+                    <span>Menu me <strong>"Install app"</strong> ya <strong>"Add to Home screen"</strong> select karein.</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;background:#0f172a;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);">
+                    <span style="background:#0ea5e9;color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;">3</span>
+                    <span>Popup par <strong>Install</strong> dabayein — App seedha phone me download/add ho jayegi!</span>
+                </div>
+            </div>
+        `;
+
+        modal.innerHTML = `
+            <div style="background:#1e293b;border:1px solid rgba(255,255,255,0.18);border-radius:22px;max-width:400px;width:100%;padding:24px;text-align:center;color:white;position:relative;box-shadow:0 25px 50px rgba(0,0,0,0.7);">
+                <button onclick="document.getElementById('exo-pwa-guide-modal').remove()" style="position:absolute;top:14px;right:16px;background:none;border:none;color:#94a3b8;font-size:24px;cursor:pointer;padding:4px;">&times;</button>
+                <div style="width:68px;height:68px;border-radius:16px;background:#0a192f;display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 4px 14px rgba(0,0,0,0.4);border:1px solid rgba(56,189,248,0.3);">
+                    <img src="icon-192.png" onerror="this.src='exologo.png'" style="width:48px;height:48px;object-fit:contain;" />
+                </div>
+                <h3 style="font-size:19px;font-weight:800;margin-bottom:6px;letter-spacing:-0.3px;">Install EXO ERP App</h3>
+                <p style="font-size:12px;color:#94a3b8;margin-bottom:16px;">Mobile me app install karne ke 3 aasaan steps:</p>
+                ${stepsHtml}
+                <button onclick="document.getElementById('exo-pwa-guide-modal').remove()" style="width:100%;padding:12px;border-radius:12px;background:linear-gradient(135deg, #0ea5e9, #6366f1);color:#fff;font-weight:700;font-size:14px;border:none;cursor:pointer;box-shadow:0 4px 14px rgba(14,165,233,0.35);">Samajh Gaya / Got It</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
     }
 
     // Mobile Sidebar Drawer Toggle & Backdrop

@@ -13,7 +13,7 @@
     { href: 'documents.html', label: (['HR', 'HR Manager', 'CEO', 'Chairman', 'IT Admin'].includes(role) ? 'Documents' : 'My Documents'), icon: 'fa-solid fa-folder-open' },
     { href: 'history.html', label: 'History Center', icon: 'fa-solid fa-clock-rotate-left' },
     // role‑based link
-    ...(['HR', 'HR Manager', 'CEO', 'Chairman', 'IT Admin'].includes(role) ? [{ href: 'undertakings.html', label: 'Undertakings', icon: 'fa-solid fa-handshake', id: 'navUndertakings' }] : []),
+    ...(['HR', 'HR Manager', 'CEO', 'Chairman', 'IT Admin'].includes(role) ? [] : []),
     { href: 'javascript:void(0)', label: 'Logout', icon: 'fa-solid fa-power-off', onClick: 'logout()' }
   ];
 
