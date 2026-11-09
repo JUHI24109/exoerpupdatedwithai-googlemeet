@@ -1,6 +1,11 @@
 <IfModule mod_rewrite.c>
 RewriteEngine On
 
+# ── Force HTTPS — redirect all HTTP to HTTPS ──
+RewriteCond %{HTTPS} off
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
 # PWA Manifest & Service Worker routing
 RewriteRule ^manifest\.json$ frontend/manifest.json [L]
 RewriteRule ^sw\.js$ frontend/sw.js [L]
@@ -22,6 +27,20 @@ RewriteRule ^api/(.*)$ api.php [L,QSA]
 
 # Serve uploaded files from backend
 RewriteRule ^uploads/(.*)$ backend/uploads/$1 [L]
+</IfModule>
+
+# ── Security Headers ──
+<IfModule mod_headers.c>
+    # Prevent browser from showing "Not Secure" warning
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" env=HTTPS
+    # Prevent MIME type sniffing
+    Header always set X-Content-Type-Options "nosniff"
+    # Prevent clickjacking
+    Header always set X-Frame-Options "SAMEORIGIN"
+    # XSS Protection
+    Header always set X-XSS-Protection "1; mode=block"
+    # Referrer Policy
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
 
 # Increase PHP timeout for deploy scripts
