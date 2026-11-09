@@ -2,7 +2,7 @@
   "name": "EXO GLOBAL Enterprise ERP",
   "short_name": "EXO ERP",
   "description": "EXO GLOBAL Enterprise Resource Planning, Project Management & Real-time Collaboration Dashboard",
-  "id": "/",
+  "id": "/frontend/index.html",
   "start_url": "/frontend/index.html",
   "scope": "/",
   "display": "standalone",
@@ -18,8 +18,26 @@
       "purpose": "any"
     },
     {
+      "src": "/frontend/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
       "src": "/icon-192.png",
       "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/frontend/icon-512.png",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
@@ -27,39 +45,45 @@
       "src": "/frontend/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
     },
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "shortcuts": [
     {
       "name": "Dashboard",
-      "url": "/dashboard.html",
-      "description": "View Company Analytics & KPIs"
+      "url": "/frontend/dashboard.html",
+      "description": "Company Analytics & KPIs"
     },
     {
       "name": "Projects",
-      "url": "/projects.html",
+      "url": "/frontend/projects.html",
       "description": "Real Estate & Construction Projects"
     },
     {
       "name": "Live Meeting",
-      "url": "/meeting.html",
-      "description": "Join or Start Video Meeting"
+      "url": "/frontend/meeting.html",
+      "description": "Video Meeting"
     },
     {
       "name": "Chat",
-      "url": "/chat.html",
-      "description": "Direct & Team Messages"
+      "url": "/frontend/chat.html",
+      "description": "Messages & Team Chat"
     },
     {
       "name": "Tickets",
-      "url": "/tickets.html",
+      "url": "/frontend/tickets.html",
       "description": "Support & Operations Tickets"
     }
   ]

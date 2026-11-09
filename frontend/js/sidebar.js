@@ -866,10 +866,12 @@
     }
 
     // Direct PWA Install Handler bundled into sidebar
-    let deferredPwaPrompt = null;
+    let deferredPwaPrompt = window.deferredPwaPrompt || null;
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPwaPrompt = e;
+        window.deferredPwaPrompt = e;
+        console.log('[EXO ERP] PWA install prompt ready and stored');
     });
 
     window.installExoApp = async function () {
@@ -880,13 +882,19 @@
         }
 
         // Android/Chrome/Edge/Windows — native install prompt available
-        if (deferredPwaPrompt) {
+        const promptEvent = deferredPwaPrompt || window.deferredPwaPrompt;
+        if (promptEvent) {
             try {
-                deferredPwaPrompt.prompt();
-                const choice = await deferredPwaPrompt.userChoice;
-                deferredPwaPrompt = null;
-                return;
-            } catch(e) {}
+                promptEvent.prompt();
+                const choice = await promptEvent.userChoice;
+                if (choice && choice.outcome === 'accepted') {
+                    deferredPwaPrompt = null;
+                    window.deferredPwaPrompt = null;
+                    return;
+                }
+            } catch(e) {
+                console.warn('[EXO ERP] Native prompt error:', e);
+            }
         }
 
         // Detect device
@@ -993,24 +1001,24 @@
                     <div>Tap <strong>Add</strong> in the top-right corner — EXO ERP will appear on your home screen.</div>
                 </div>`;
         } else if (type === 'android') {
-            deviceLabel = 'Android';
+            deviceLabel = 'Android Phone / Tablet';
             deviceIcon = '<i class="fa-brands fa-android"></i>';
             steps = `
                 <div class="exo-pwa-step">
                     <div class="exo-pwa-step-num">1</div>
-                    <div>Open this page in <strong>Chrome</strong> browser on your Android device.</div>
+                    <div>Open this site in <strong>Google Chrome</strong> or <strong>Samsung Internet</strong>.</div>
                 </div>
                 <div class="exo-pwa-step">
                     <div class="exo-pwa-step-num">2</div>
-                    <div>Tap the <strong>3-dot menu</strong> <i class="fa-solid fa-ellipsis-vertical"></i> in the top-right corner of Chrome.</div>
+                    <div>Tap the <strong>3-dot menu</strong> <i class="fa-solid fa-ellipsis-vertical"></i> in the top-right corner.</div>
                 </div>
                 <div class="exo-pwa-step">
                     <div class="exo-pwa-step-num">3</div>
-                    <div>Select <strong>"Add to Home screen"</strong> or <strong>"Install app"</strong>.</div>
+                    <div>Select <strong>"Install app"</strong> in the menu (choose <em>"Install app"</em>, not "Create shortcut").</div>
                 </div>
                 <div class="exo-pwa-step">
                     <div class="exo-pwa-step-num">4</div>
-                    <div>Tap <strong>Install</strong> — EXO ERP will be added to your home screen.</div>
+                    <div>Tap <strong>Install</strong> — EXO ERP will install as a standalone app on your phone!</div>
                 </div>`;
         } else if (type === 'windows') {
             deviceLabel = 'Windows PC';

@@ -4,11 +4,12 @@
  * Desktop (Windows, macOS, Linux) and Mobile (Android, iOS).
  */
 
-const CACHE_NAME = 'exo-erp-pwa-v2';
+const CACHE_NAME = 'exo-erp-pwa-v3';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/frontend/index.html',
+  '/frontend/dashboard.html',
   '/manifest.json',
   '/frontend/manifest.json',
   '/icon-192.png',
@@ -20,13 +21,14 @@ const STATIC_ASSETS = [
 
 // Install: Cache core app shell
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log('[EXO PWA] Caching app shell assets');
       return cache.addAll(STATIC_ASSETS).catch((err) => {
         console.warn('[EXO PWA] Pre-cache partial fail (safe to ignore):', err);
       });
-    }).then(() => self.skipWaiting())
+    })
   );
 });
 
@@ -74,7 +76,7 @@ self.addEventListener('fetch', (event) => {
           if (cachedRes) return cachedRes;
           // Fallback to home page if navigating to an HTML document
           if (req.headers.get('accept')?.includes('text/html')) {
-            return caches.match('/index.html');
+            return caches.match('/frontend/index.html') || caches.match('/index.html');
           }
         });
       })

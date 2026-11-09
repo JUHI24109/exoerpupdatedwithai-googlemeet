@@ -29,7 +29,7 @@ RewriteRule ^api/(.*)$ api.php [L,QSA]
 RewriteRule ^uploads/(.*)$ backend/uploads/$1 [L]
 </IfModule>
 
-# ── Security Headers ──
+# ── Security & PWA Headers ──
 <IfModule mod_headers.c>
     # Prevent browser from showing "Not Secure" warning
     Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" env=HTTPS
@@ -41,6 +41,12 @@ RewriteRule ^uploads/(.*)$ backend/uploads/$1 [L]
     Header always set X-XSS-Protection "1; mode=block"
     # Referrer Policy
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # PWA Service Worker & Manifest freshness + full root scope permission
+    <FilesMatch "(sw\.js|manifest\.json)">
+        Header always set Cache-Control "no-cache, no-store, must-revalidate"
+        Header always set Service-Worker-Allowed "/"
+    </FilesMatch>
 </IfModule>
 
 # Increase PHP timeout for deploy scripts
