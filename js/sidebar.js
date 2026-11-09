@@ -881,7 +881,30 @@
             return;
         }
 
-        // Android/Chrome/Edge/Windows — native install prompt available
+        const ua = navigator.userAgent;
+        const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+        const isAndroid = /Android/.test(ua);
+        const isMacSafari = /^((?!chrome|android).)*safari/i.test(ua) && /Mac/.test(ua);
+        const isWindows = /Windows/.test(ua);
+
+        // ── iOS Direct Install (Apple WebClip Profile) ──
+        if (isIOS) {
+            // Trigger iOS system profile download immediately
+            try {
+                const downloadLink = document.createElement('a');
+                downloadLink.href = '/exo-erp.mobileconfig';
+                downloadLink.download = 'exo-erp.mobileconfig';
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                setTimeout(() => downloadLink.remove(), 1000);
+            } catch (e) {
+                window.location.href = '/exo-erp.mobileconfig';
+            }
+            showPwaModal('ios');
+            return;
+        }
+
+        // ── Android / Windows / Desktop Chromium Native Prompt ──
         const promptEvent = deferredPwaPrompt || window.deferredPwaPrompt;
         if (promptEvent) {
             try {
@@ -897,14 +920,38 @@
             }
         }
 
-        // Detect device
-        const ua = navigator.userAgent;
-        const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
-        const isAndroid = /Android/.test(ua);
-        const isMacSafari = /^((?!chrome|android).)*safari/i.test(ua) && /Mac/.test(ua);
-        const isWindows = /Windows/.test(ua);
+        // If prompt not immediately ready on Android, wait up to 1.5s
+        if (isAndroid && !promptEvent) {
+            const waitingToast = document.createElement('div');
+            waitingToast.id = 'exo-pwa-waiting';
+            waitingToast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#0f172a;border:1px solid #0ea5e9;color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:600;z-index:9999999;box-shadow:0 10px 30px rgba(0,0,0,0.5);display:flex;align-items:center;gap:10px;';
+            waitingToast.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="color:#38bdf8;"></i> Preparing App Installation...';
+            document.body.appendChild(waitingToast);
 
-        if (isIOS || isMacSafari) {
+            let triggered = false;
+            const handler = async (e) => {
+                e.preventDefault();
+                deferredPwaPrompt = e;
+                window.deferredPwaPrompt = e;
+                waitingToast.remove();
+                triggered = true;
+                try {
+                    e.prompt();
+                    await e.userChoice;
+                } catch(err) {}
+            };
+            window.addEventListener('beforeinstallprompt', handler, { once: true });
+
+            setTimeout(() => {
+                if (!triggered) {
+                    if (document.getElementById('exo-pwa-waiting')) waitingToast.remove();
+                    showPwaModal('android');
+                }
+            }, 1500);
+            return;
+        }
+
+        if (isMacSafari) {
             showPwaModal('ios');
         } else if (isAndroid) {
             showPwaModal('android');
@@ -984,21 +1031,42 @@
             deviceLabel = 'iPhone / iPad';
             deviceIcon = '<i class="fa-brands fa-apple"></i>';
             steps = `
-                <div class="exo-pwa-step">
-                    <div class="exo-pwa-step-num">1</div>
-                    <div>Open this page in <strong>Safari</strong> browser — PWA install only works in Safari on iOS.</div>
+                <div style="background:rgba(14,165,233,0.12); border:1px solid rgba(14,165,233,0.3); border-radius:14px; padding:14px; margin-bottom:14px; text-align:left;">
+                    <div style="font-weight:700; color:#38bdf8; font-size:13.5px; margin-bottom:6px; display:flex; align-items:center; gap:8px;">
+                        <i class="fa-brands fa-apple" style="font-size:18px;"></i> Native iOS App Installation
+                    </div>
+                    <div style="font-size:12.5px; color:#cbd5e1; line-height:1.5; margin-bottom:10px;">
+                        The iOS configuration profile has been requested. Tap <strong>"Allow"</strong> on the popup, then finish in Settings:
+                    </div>
+                    <div class="exo-pwa-step" style="padding:10px 12px; margin-bottom:8px;">
+                        <div class="exo-pwa-step-num">1</div>
+                        <div>Tap <strong>"Allow"</strong> when iOS asks to download profile.</div>
+                    </div>
+                    <div class="exo-pwa-step" style="padding:10px 12px; margin-bottom:8px;">
+                        <div class="exo-pwa-step-num">2</div>
+                        <div>Open iPhone <strong>Settings ⚙️</strong> &rarr; tap <strong>"Profile Downloaded"</strong> at top.</div>
+                    </div>
+                    <div class="exo-pwa-step" style="padding:10px 12px; margin-bottom:12px;">
+                        <div class="exo-pwa-step-num">3</div>
+                        <div>Tap <strong>"Install"</strong> &rarr; EXO ERP app icon appears on your Home Screen!</div>
+                    </div>
+                    <a href="/exo-erp.mobileconfig" class="exo-pwa-install-btn" style="display:flex; align-items:center; justify-content:center; gap:8px; text-decoration:none; padding:11px;">
+                        <i class="fa-solid fa-download"></i> Download iOS Profile Again
+                    </a>
                 </div>
-                <div class="exo-pwa-step">
-                    <div class="exo-pwa-step-num">2</div>
-                    <div>Tap the <strong>Share</strong> button <i class="fa-solid fa-arrow-up-from-bracket"></i> at the bottom of Safari.</div>
+
+                <div style="margin:14px 0 8px; font-size:11px; color:#64748b; font-weight:700; letter-spacing:0.5px; display:flex; align-items:center; gap:8px;">
+                    <span style="flex:1; height:1px; background:rgba(255,255,255,0.1);"></span>
+                    <span>ALTERNATIVE: VIA SAFARI SHARE MENU</span>
+                    <span style="flex:1; height:1px; background:rgba(255,255,255,0.1);"></span>
                 </div>
-                <div class="exo-pwa-step">
-                    <div class="exo-pwa-step-num">3</div>
-                    <div>Scroll down and tap <strong>"Add to Home Screen"</strong> <i class="fa-regular fa-square-plus"></i>.</div>
+                <div class="exo-pwa-step" style="padding:10px 12px; margin-bottom:8px;">
+                    <div class="exo-pwa-step-num">A</div>
+                    <div>In Safari, tap the <strong>Share</strong> button <i class="fa-solid fa-arrow-up-from-bracket"></i> at the bottom.</div>
                 </div>
-                <div class="exo-pwa-step">
-                    <div class="exo-pwa-step-num">4</div>
-                    <div>Tap <strong>Add</strong> in the top-right corner — EXO ERP will appear on your home screen.</div>
+                <div class="exo-pwa-step" style="padding:10px 12px; margin-bottom:4px;">
+                    <div class="exo-pwa-step-num">B</div>
+                    <div>Scroll down and select <strong>"Add to Home Screen"</strong> <i class="fa-regular fa-square-plus"></i> &rarr; tap <strong>Add</strong>.</div>
                 </div>`;
         } else if (type === 'android') {
             deviceLabel = 'Android Phone / Tablet';

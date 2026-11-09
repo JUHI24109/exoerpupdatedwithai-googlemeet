@@ -11,6 +11,10 @@ RewriteRule ^manifest\.json$ frontend/manifest.json [L]
 RewriteRule ^sw\.js$ frontend/sw.js [L]
 RewriteRule ^icon-192\.png$ frontend/icon-192.png [L]
 RewriteRule ^icon-512\.png$ frontend/icon-512.png [L]
+RewriteRule ^exo-erp\.mobileconfig$ frontend/exo-erp.mobileconfig [L]
+
+# Apple iOS WebClip configuration profile MIME type
+AddType application/x-apple-aspen-config .mobileconfig
 
 # Direct meeting links support
 RewriteRule ^meeting\.html$ frontend/meeting.html [L]
@@ -29,7 +33,7 @@ RewriteRule ^api/(.*)$ api.php [L,QSA]
 RewriteRule ^uploads/(.*)$ backend/uploads/$1 [L]
 </IfModule>
 
-# ── Security & PWA Headers ──
+# ── Security Headers ──
 <IfModule mod_headers.c>
     # Prevent browser from showing "Not Secure" warning
     Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" env=HTTPS
@@ -41,12 +45,6 @@ RewriteRule ^uploads/(.*)$ backend/uploads/$1 [L]
     Header always set X-XSS-Protection "1; mode=block"
     # Referrer Policy
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
-
-    # PWA Service Worker & Manifest freshness + full root scope permission
-    <FilesMatch "(sw\.js|manifest\.json)">
-        Header always set Cache-Control "no-cache, no-store, must-revalidate"
-        Header always set Service-Worker-Allowed "/"
-    </FilesMatch>
 </IfModule>
 
 # Increase PHP timeout for deploy scripts

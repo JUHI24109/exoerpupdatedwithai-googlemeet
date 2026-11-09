@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>PayloadContent</key>
+    <array>
+        <dict>
+            <key>FullScreen</key>
+            <true/>
+            <key>Icon</key>
+            <data>
+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
+            </data>
+            <key>IsRemovable</key>
+            <true/>
+            <key>Label</key>
+            <string>EXO ERP</string>
+            <key>PayloadDescription</key>
+            <string>EXO GLOBAL Enterprise ERP Standalone App</string>
+            <key>PayloadDisplayName</key>
+            <string>EXO ERP</string>
+            <key>PayloadIdentifier</key>
+            <string>com.exolaw.erp.webclip</string>
+            <key>PayloadType</key>
+            <string>com.apple.webClip.managed</string>
+            <key>PayloadUUID</key>
+            <string>7e324c45-5627-4632-a720-6d808544d671</string>
+            <key>PayloadVersion</key>
+            <integer>1</integer>
+            <key>Precomposed</key>
+            <true/>
+            <key>URL</key>
+            <string>https://www.exolaw.com/frontend/index.html</string>
+        </dict>
+    </array>
+    <key>PayloadDescription</key>
+    <string>Installs EXO ERP Standalone App on Home Screen</string>
+    <key>PayloadDisplayName</key>
+    <string>EXO ERP App</string>
+    <key>PayloadIdentifier</key>
+    <string>com.exolaw.erp.profile</string>
+    <key>PayloadOrganization</key>
+    <string>EXO GLOBAL</string>
+    <key>PayloadRemovalDisallowed</key>
+    <false/>
+    <key>PayloadType</key>
+    <string>Configuration</string>
+    <key>PayloadUUID</key>
+    <string>8f435d56-6738-4743-b831-7e919655e782</string>
+    <key>PayloadVersion</key>
+    <integer>1</integer>
+</dict>
+</plist>
