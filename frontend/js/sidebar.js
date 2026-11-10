@@ -887,19 +887,8 @@
         const isMacSafari = /^((?!chrome|android).)*safari/i.test(ua) && /Mac/.test(ua);
         const isWindows = /Windows/.test(ua);
 
-        // ── iOS Direct Install (Apple WebClip Profile) ──
+        // ── iOS Direct Install Helper ──
         if (isIOS) {
-            // Trigger iOS system profile download immediately
-            try {
-                const downloadLink = document.createElement('a');
-                downloadLink.href = '/exo-erp.mobileconfig';
-                downloadLink.download = 'exo-erp.mobileconfig';
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                setTimeout(() => downloadLink.remove(), 1000);
-            } catch (e) {
-                window.location.href = '/exo-erp.mobileconfig';
-            }
             showPwaModal('ios');
             return;
         }
@@ -1028,46 +1017,39 @@
         }
 
         if (type === 'ios') {
-            deviceLabel = 'iPhone / iPad';
+            deviceLabel = 'iPhone / iPad (iOS)';
             deviceIcon = '<i class="fa-brands fa-apple"></i>';
             steps = `
-                <div style="background:rgba(14,165,233,0.12); border:1px solid rgba(14,165,233,0.3); border-radius:14px; padding:14px; margin-bottom:14px; text-align:left;">
-                    <div style="font-weight:700; color:#38bdf8; font-size:13.5px; margin-bottom:6px; display:flex; align-items:center; gap:8px;">
-                        <i class="fa-brands fa-apple" style="font-size:18px;"></i> Native iOS App Installation
+                <div style="background:linear-gradient(135deg, rgba(14,165,233,0.18), rgba(99,102,241,0.12)); border:1px solid rgba(14,165,233,0.35); border-radius:16px; padding:16px; margin-bottom:14px; text-align:left;">
+                    <div style="font-weight:800; color:#38bdf8; font-size:14px; margin-bottom:10px; display:flex; align-items:center; gap:8px;">
+                        <i class="fa-solid fa-bolt" style="color:#f59e0b;"></i> Easy 2-Tap Install (Recommended)
                     </div>
-                    <div style="font-size:12.5px; color:#cbd5e1; line-height:1.5; margin-bottom:10px;">
-                        The iOS configuration profile has been requested. Tap <strong>"Allow"</strong> on the popup, then finish in Settings:
+                    <div class="exo-pwa-step" style="padding:11px 13px; margin-bottom:9px; background:#0b1329;">
+                        <div class="exo-pwa-step-num" style="background:#0ea5e9;">1</div>
+                        <div>At the bottom of Safari, tap the <strong>Share</strong> button <i class="fa-solid fa-arrow-up-from-bracket" style="color:#38bdf8; margin:0 3px;"></i>.</div>
                     </div>
-                    <div class="exo-pwa-step" style="padding:10px 12px; margin-bottom:8px;">
-                        <div class="exo-pwa-step-num">1</div>
-                        <div>Tap <strong>"Allow"</strong> when iOS asks to download profile.</div>
+                    <div class="exo-pwa-step" style="padding:11px 13px; margin-bottom:9px; background:#0b1329;">
+                        <div class="exo-pwa-step-num" style="background:#0ea5e9;">2</div>
+                        <div>Scroll down and tap <strong>"Add to Home Screen"</strong> <i class="fa-regular fa-square-plus" style="color:#38bdf8; margin:0 3px;"></i>.</div>
                     </div>
-                    <div class="exo-pwa-step" style="padding:10px 12px; margin-bottom:8px;">
-                        <div class="exo-pwa-step-num">2</div>
-                        <div>Open iPhone <strong>Settings ⚙️</strong> &rarr; tap <strong>"Profile Downloaded"</strong> at top.</div>
+                    <div class="exo-pwa-step" style="padding:11px 13px; margin-bottom:2px; background:#0b1329;">
+                        <div class="exo-pwa-step-num" style="background:#10b981;">3</div>
+                        <div>Tap <strong>"Add"</strong> in the top-right corner — EXO ERP installs immediately on your iPhone!</div>
                     </div>
-                    <div class="exo-pwa-step" style="padding:10px 12px; margin-bottom:12px;">
-                        <div class="exo-pwa-step-num">3</div>
-                        <div>Tap <strong>"Install"</strong> &rarr; EXO ERP app icon appears on your Home Screen!</div>
-                    </div>
-                    <a href="/exo-erp.mobileconfig" class="exo-pwa-install-btn" style="display:flex; align-items:center; justify-content:center; gap:8px; text-decoration:none; padding:11px;">
-                        <i class="fa-solid fa-download"></i> Download iOS Profile Again
-                    </a>
                 </div>
 
-                <div style="margin:14px 0 8px; font-size:11px; color:#64748b; font-weight:700; letter-spacing:0.5px; display:flex; align-items:center; gap:8px;">
-                    <span style="flex:1; height:1px; background:rgba(255,255,255,0.1);"></span>
-                    <span>ALTERNATIVE: VIA SAFARI SHARE MENU</span>
-                    <span style="flex:1; height:1px; background:rgba(255,255,255,0.1);"></span>
-                </div>
-                <div class="exo-pwa-step" style="padding:10px 12px; margin-bottom:8px;">
-                    <div class="exo-pwa-step-num">A</div>
-                    <div>In Safari, tap the <strong>Share</strong> button <i class="fa-solid fa-arrow-up-from-bracket"></i> at the bottom.</div>
-                </div>
-                <div class="exo-pwa-step" style="padding:10px 12px; margin-bottom:4px;">
-                    <div class="exo-pwa-step-num">B</div>
-                    <div>Scroll down and select <strong>"Add to Home Screen"</strong> <i class="fa-regular fa-square-plus"></i> &rarr; tap <strong>Add</strong>.</div>
-                </div>`;
+                <details style="text-align:left; background:#0f172a; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:10px 14px; font-size:12px; color:#94a3b8; cursor:pointer;">
+                    <summary style="font-weight:600; color:#cbd5e1; outline:none;">
+                        ⚙️ Downloaded the iOS Settings Profile? Tap here to finish
+                    </summary>
+                    <div style="margin-top:10px; line-height:1.6; color:#94a3b8;">
+                        If you downloaded the profile file, open your iPhone:
+                        <br><strong>Settings ⚙️ &rarr; General &rarr; VPN & Device Management &rarr; tap "EXO ERP" &rarr; tap "Install"</strong>.
+                        <div style="margin-top:8px;">
+                            <a href="/exo-erp.mobileconfig" style="color:#38bdf8; text-decoration:underline;">Click here to download profile again</a> if needed.
+                        </div>
+                    </div>
+                </details>`;
         } else if (type === 'android') {
             deviceLabel = 'Android Phone / Tablet';
             deviceIcon = '<i class="fa-brands fa-android"></i>';
