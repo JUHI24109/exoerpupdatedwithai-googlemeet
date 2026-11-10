@@ -887,8 +887,24 @@
         const isMacSafari = /^((?!chrome|android).)*safari/i.test(ua) && /Mac/.test(ua);
         const isWindows = /Windows/.test(ua);
 
-        // ── iOS Direct Install Helper ──
+        // ── iOS Direct Native Share Sheet Trigger ──
         if (isIOS) {
+            if (navigator.share) {
+                try {
+                    showToastNotification('📱 Install on iPhone', 'Tap "Add to Home Screen" in the sheet below!');
+                    await navigator.share({
+                        title: 'EXO GLOBAL ERP',
+                        text: 'Install EXO ERP App on Home Screen',
+                        url: window.location.href
+                    });
+                    return;
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        showPwaModal('ios');
+                    }
+                    return;
+                }
+            }
             showPwaModal('ios');
             return;
         }
